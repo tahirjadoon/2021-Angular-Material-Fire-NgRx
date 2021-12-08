@@ -16,6 +16,10 @@ Angular:
 Package                      Version
 ------------------------------------------------------
 @angular-devkit/architect    0.1300.2 (cli-only)
+
 @angular-devkit/core         13.0.2 (cli-only)
+
 @angular-devkit/schematics   13.0.2 (cli-only)
+
 @schematics/angular          13.0.2 (cli-only)
+
