@@ -7,3 +7,4 @@ Each functionality is built with its own project.
 
 Each project has an associated text document with the same name that details the steps taken for that project
 
+If you download any project then must run >npm install first
