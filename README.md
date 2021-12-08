@@ -2,6 +2,9 @@
 
 Angular app with Angular Material, Angular Fire and NgRx
 
+Versions
+--------
+
 Angular CLI: 13.0.2
 
 Node: 16.13.0

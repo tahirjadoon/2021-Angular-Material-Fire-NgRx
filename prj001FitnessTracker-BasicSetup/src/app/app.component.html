@@ -1,0 +1,84 @@
+<p>Button Variants</p>
+<strong>Attribute: 	Description</strong><br />
+mat-button: 	Rectangular text button w/ no elevation<br />
+mat-raised-button: 	Rectangular contained button w/ elevation<br />
+mat-flat-button: 	Rectangular contained button w/ no elevation<br />
+mat-stroked-button: 	Rectangular outlined button w/ no elevation<br />
+mat-icon-button: 	Circular button with a transparent background, meant to contain an icon<br />
+mat-fab: 	Circular button w/ elevation, defaults to theme's accent color<br />
+mat-mini-fab: 	Same as mat-fab but smaller
+
+<p>Simple Button</p>
+<button mat-button>Basic</button>
+<button mat-button color="primary">Primary</button>
+<button mat-button color="accent">Accent</button>
+<button mat-button color="warn">Warn</button>
+<button mat-button disabled>Disabled</button>
+
+<p>Raised Button</p>
+<button mat-raised-button>Basic</button>
+<button mat-raised-button color="primary">Primary</button>
+<button mat-raised-button color="accent">Accent</button>
+<button mat-raised-button color="warn">Warn</button>
+<button mat-raised-button disabled>Disabled</button>
+
+<p>Stroked Button</p>
+<button mat-stroked-button>Basic</button>
+<button mat-stroked-button color="primary">Primary</button>
+<button mat-stroked-button color="accent">Accent</button>
+<button mat-stroked-button color="warn">Warn</button>
+<button mat-stroked-button disabled>Disabled</button>
+
+<p>Flat Button</p>
+<button mat-flat-button>Basic</button>
+<button mat-flat-button color="primary">Primary</button>
+<button mat-flat-button color="accent">Accent</button>
+<button mat-flat-button color="warn">Warn</button>
+<button mat-flat-button disabled>Disabled</button>
+
+<p>Icon</p>
+<button mat-icon-button aria-label="Example icon button with a vertical three dot icon">
+  <mat-icon>more_vert</mat-icon>
+</button>
+<button mat-icon-button color="primary" aria-label="Example icon button with a home icon">
+  <mat-icon>home</mat-icon>
+</button>
+<button mat-icon-button color="accent" aria-label="Example icon button with a menu icon">
+  <mat-icon>menu</mat-icon>
+</button>
+<button mat-icon-button color="warn" aria-label="Example icon button with a heart icon">
+  <mat-icon>favorite</mat-icon>
+</button>
+<button mat-icon-button disabled aria-label="Example icon button with a open in new tab icon">
+  <mat-icon>open_in_new</mat-icon>
+</button>
+
+<p>Mat Fab</p>
+<button mat-fab color="primary" aria-label="Example icon button with a delete icon">
+  <mat-icon>delete</mat-icon>
+</button>
+<button mat-fab color="accent" aria-label="Example icon button with a bookmark icon">
+  <mat-icon>bookmark</mat-icon>
+</button>
+<button mat-fab color="warn" aria-label="Example icon button with a home icon">
+  <mat-icon>home</mat-icon>
+</button>
+<button mat-fab disabled aria-label="Example icon button with a heart icon">
+  <mat-icon>favorite</mat-icon>
+</button>
+
+<p>Mini Fab</p>
+<button mat-mini-fab color="primary" aria-label="Example icon button with a menu icon">
+  <mat-icon>menu</mat-icon>
+</button>
+<button mat-mini-fab color="accent" aria-label="Example icon button with a plus one icon">
+  <mat-icon>plus_one</mat-icon>
+</button>
+<button mat-mini-fab color="warn" aria-label="Example icon button with a filter list icon">
+  <mat-icon>filter_list</mat-icon>
+</button>
+<button mat-mini-fab disabled aria-label="Example icon button with a home icon">
+  <mat-icon>home</mat-icon>
+</button>
+
+<router-outlet></router-outlet>

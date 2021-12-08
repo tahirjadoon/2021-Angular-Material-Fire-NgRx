@@ -1,0 +1,193 @@
+
+Project folder: prj001FitnessTracker-BasicSetup
+
+-----------------------------------------------------------------------------
+
+When creating a new project with ng new, you should run it in conjunction with the --no-strict flag 
+(e.g. ng new my-project --no-strict) and then answer the following questions:
+
+1) Do you want to use the Angular Router?
+
+2) Which CSS pre-processor do you want to use?
+
+Choose these responses:
+
+1) No (No router for now, we'll add it later) -- just follow along the projects
+
+2) CSS (you can pick scss etc, for the scope of this project will select css)
+
+----------------------------------------------------------------------------
+
+Create an angular project 
+> ng new prj001FitnessTracker-BasicSetup --no-strict
+
+once installed, on command prompt go inside the project and then enter 
+> code . 
+This will open the project in visual studio code 
+	
+Then inside the terminal in vs code execute following two
+>ng build
+>ng serve
+
+Above will give a message like 
+	** Angular Live Development Server is listening on localhost:4200, open your browser on http://localhost:4200/ **
+	
+Go to http://localhost:4200/ to view the app
+
+You should see the default app 
+
+To break out of it, press CTRL+C together to terminate
+
+-----------------------------------------------------------------------------
+
+Add angular material 
+
+Route 1: 
+	Follow this: https://material.angular.io/guide/getting-started 
+	
+	>ng add @angular/material 
+	This will add all the required pieces like animation and fonts etc. 
+	
+Route 2: 
+	Manual adding, in this project i have taken this route 
+	
+	#1. >npm install --save @angular/material @angular/cdk
+	#2. >npm install --save @angular/animations 
+		Before executing above make sure that it isn't installed by #1
+		Open package.json file in the root and look for @angular/animations under dependencies. If it is there then don't install
+		
+		
+	#3. import BrowserAnimationsModule 
+		Open src \ app \ app.module.ts and import 
+		import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+		and then also add to the imports as well
+		imports: [
+			BrowserModule,
+			AppRoutingModule,
+			BrowserAnimationsModule
+		  ]
+		  
+	For importing the ComponentModules we plan on using... 
+		For this will create a seperate module in src app folder and then will use that inside the app.module.ts 
+		
+		>ng g m Modules\Material --flat --module=app 
+			This will create a new file in Modules folder with name material.module.ts
+				Open material.module.ts 
+				Remove CommonModule import and imports array 
+				Add MatButtonModule, MatCheckBoxModule to both import and export array. We'll keep on adding different modules here when we'll use those
+				Check material.module.ts for more details
+			Also this will add the module to the imports array of the app.module.ts by properly importing it as well towards the top
+		
+	Adding the Theme
+		@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+		add above line to src \ styles.css
+		
+	Gesture Support
+		>npm install --save hammerjs 
+		run above command 
+		Then open src \ main.ts and import it. 
+			import 'hammerjs';
+	
+	Adding Material Icons 
+		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+		Add the above inside the head section of src \ index.html 
+	
+>ng serve
+	run the app to make sure that nothing is broken. 
+------------------------------------------------------------------
+
+Lets try some buttons to make sure all is working 
+
+open app.component.html and delete the place holder stuff. Just keep the router-outlet
+
+Go to https://material.angular.io/components/button/overview and find the button and place in the html file
+
+Add the following html and then view the output. Check "prj001FitnessTracker-BasicSetup.pdf" for more details. 
+
+	<p>Button Variants</p>
+	<strong>Attribute: 	Description</strong><br />
+	mat-button: 	Rectangular text button w/ no elevation<br />
+	mat-raised-button: 	Rectangular contained button w/ elevation<br />
+	mat-flat-button: 	Rectangular contained button w/ no elevation<br />
+	mat-stroked-button: 	Rectangular outlined button w/ no elevation<br />
+	mat-icon-button: 	Circular button with a transparent background, meant to contain an icon<br />
+	mat-fab: 	Circular button w/ elevation, defaults to theme's accent color<br />
+	mat-mini-fab: 	Same as mat-fab but smaller
+
+	<p>Simple Button</p>
+	<button mat-button>Basic</button>
+	<button mat-button color="primary">Primary</button>
+	<button mat-button color="accent">Accent</button>
+	<button mat-button color="warn">Warn</button>
+	<button mat-button disabled>Disabled</button>
+
+	<p>Raised Button</p>
+	<button mat-raised-button>Basic</button>
+	<button mat-raised-button color="primary">Primary</button>
+	<button mat-raised-button color="accent">Accent</button>
+	<button mat-raised-button color="warn">Warn</button>
+	<button mat-raised-button disabled>Disabled</button>
+
+	<p>Stroked Button</p>
+	<button mat-stroked-button>Basic</button>
+	<button mat-stroked-button color="primary">Primary</button>
+	<button mat-stroked-button color="accent">Accent</button>
+	<button mat-stroked-button color="warn">Warn</button>
+	<button mat-stroked-button disabled>Disabled</button>
+
+	<p>Flat Button</p>
+	<button mat-flat-button>Basic</button>
+	<button mat-flat-button color="primary">Primary</button>
+	<button mat-flat-button color="accent">Accent</button>
+	<button mat-flat-button color="warn">Warn</button>
+	<button mat-flat-button disabled>Disabled</button>
+
+	<p>Icon</p>
+	<button mat-icon-button aria-label="Example icon button with a vertical three dot icon">
+	  <mat-icon>more_vert</mat-icon>
+	</button>
+	<button mat-icon-button color="primary" aria-label="Example icon button with a home icon">
+	  <mat-icon>home</mat-icon>
+	</button>
+	<button mat-icon-button color="accent" aria-label="Example icon button with a menu icon">
+	  <mat-icon>menu</mat-icon>
+	</button>
+	<button mat-icon-button color="warn" aria-label="Example icon button with a heart icon">
+	  <mat-icon>favorite</mat-icon>
+	</button>
+	<button mat-icon-button disabled aria-label="Example icon button with a open in new tab icon">
+	  <mat-icon>open_in_new</mat-icon>
+	</button>
+
+	<p>Mat Fab</p>
+	<button mat-fab color="primary" aria-label="Example icon button with a delete icon">
+	  <mat-icon>delete</mat-icon>
+	</button>
+	<button mat-fab color="accent" aria-label="Example icon button with a bookmark icon">
+	  <mat-icon>bookmark</mat-icon>
+	</button>
+	<button mat-fab color="warn" aria-label="Example icon button with a home icon">
+	  <mat-icon>home</mat-icon>
+	</button>
+	<button mat-fab disabled aria-label="Example icon button with a heart icon">
+	  <mat-icon>favorite</mat-icon>
+	</button>
+
+	<p>Mini Fab</p>
+	<button mat-mini-fab color="primary" aria-label="Example icon button with a menu icon">
+	  <mat-icon>menu</mat-icon>
+	</button>
+	<button mat-mini-fab color="accent" aria-label="Example icon button with a plus one icon">
+	  <mat-icon>plus_one</mat-icon>
+	</button>
+	<button mat-mini-fab color="warn" aria-label="Example icon button with a filter list icon">
+	  <mat-icon>filter_list</mat-icon>
+	</button>
+	<button mat-mini-fab disabled aria-label="Example icon button with a home icon">
+	  <mat-icon>home</mat-icon>
+	</button>
+
+
+run the app >ng serve and check the page for different buttons that are showing
+
+
