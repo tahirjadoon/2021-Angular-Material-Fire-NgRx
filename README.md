@@ -26,3 +26,7 @@ Package                      Version
 
 @schematics/angular          13.0.2 (cli-only)
 
+
+Info
+------------------------------------------------------
+Check "000 Introduction" for more details. 

@@ -1,5 +1,9 @@
 https://material.angular.io/
 
-Prebuilt and styles components components. Here is complete list with usage examples 
+Prebuilt and styles components. Here is complete list with usage examples 
 https://material.angular.io/components/categories 
+
+Each functionality is built with its own project. 
+
+Each project has an associated text document with the same name that details the steps taken for that project
 
