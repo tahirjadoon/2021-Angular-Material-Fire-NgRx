@@ -1,0 +1,51 @@
+Open "prj001FitnessTracker-BasicSetup" in file explorer and delete node_modules
+
+Copy "prj001FitnessTracker-BasicSetup" and rename as "prj002FitnessTracker-AppStructure"
+
+Open "prj002FitnessTracker-AppStructure" in vs code 
+
+Open src \ app \ app.component.html and delete all content except router-outlet
+
+Finally run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+In the app folder create a new folder called Site. We'll create all of our components here
+
+Following will create the components and will also import and add to the declarations array in app.modules.ts
+
+>ng g c Site/welcome --module app
+>ng g c Site/auth/signup --module app
+>ng g c Site/auth/login --module app
+>ng g c Site/training --module app 
+>ng g c Site/training/current-training --module app
+>ng g c Site/training/new-training --module app
+>ng g c Site/training/past-trainings --module app
+
+------------------------------------------------------------------------------
+
+Routing 
+
+Open app-routing.module.ts and add the following routes for now 
+
+const routes: Routes = [
+  {path: '', component: WelcomeComponent},
+  {path: 'signup', component: SignupComponent},
+  {path: 'login', component: LoginComponent},
+  {path: 'training', component: TrainingComponent}
+];
+
+Open app.component.html and make sure that "<router-outlet></router-outlet>" is there
+
+Run the app using ng serve
+
+http://localhost:4200/ should show welcome message
+http://localhost:4200/training should show training message 
+http://localhost:4200/signup should show signup message 
+http://localhost:4200/login should show login message 
+
+
