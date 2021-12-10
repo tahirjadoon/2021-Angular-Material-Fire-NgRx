@@ -91,6 +91,33 @@ Route 2:
 	Adding Material Icons 
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		Add the above inside the head section of src \ index.html 
+		
+	Add flex layout [For usage details check prj003FitnessTracker-SignupForm] 
+		https://github.com/angular/flex-layout/wiki/Using-Angular-CLI 
+		>npm install angular/flex-layout-builds --save
+		
+		and import it as well in src \ app \ app.module.ts
+		
+		import { FlexLayoutModule } from '@angular/flex-layout';
+		
+		imports: [
+			BrowserModule,
+			AppRoutingModule,
+			BrowserAnimationsModule,
+			MaterialModule,
+			FlexLayoutModule
+		  ]
+		
+Also add FormsModule to src \ app \ app.module.ts
+	import { FormsModule } from '@angular/forms';
+	imports: [
+		BrowserModule,
+		AppRoutingModule,
+		BrowserAnimationsModule,
+		MaterialModule,
+		FlexLayoutModule, 
+		FormsModule
+	  ]
 	
 >ng serve
 	run the app to make sure that nothing is broken. 

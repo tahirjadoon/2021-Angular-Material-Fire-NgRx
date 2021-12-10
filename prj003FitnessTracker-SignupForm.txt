@@ -1,0 +1,35 @@
+Open "prj002FitnessTracker-AppStructure" in file explorer and delete node_modules
+
+Copy "prj002FitnessTracker-AppStructure" and rename as "prj003FitnessTracker-SignupForm"
+
+Open "prj003FitnessTracker-SignupForm" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+For this checkout the signup.component.html and signup.component.ts for code details
+
+https://material.angular.io/components/form-field/overview
+https://material.angular.io/components/input/overview
+
+
+Hint: 
+	add to the Modules \ material.module.ts file  
+	* MatFormFieldModule
+	* MatInputModule
+	* MatDatepickerModule 
+	* MatNativeDateModule to be used with MatDatepickerModule, import from @angular/material/core
+	* MatCheckboxModule
+	
+We have added angular flex layout so check the following out
+https://github.com/angular/flex-layout/wiki/API-Documentation 
+	Go to documentation and then check Static API and Responsive API 
+	
+* Signup form is using template driven approach. 
+* It is doing all the validations
+* Shows usage of input, password, datepicker and checkbox 
