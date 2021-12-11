@@ -1,0 +1,44 @@
+Open "prj003FitnessTracker-SignupForm" in file explorer and delete node_modules
+
+Copy "prj003FitnessTracker-SignupForm" and rename as "prj004FitnessTracker-LoginForm"
+
+Open "prj004FitnessTracker-LoginForm" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+For this checkout the login.component.html and login.component.ts for code details
+
+Login form is reactive form approach
+
+Hint: do import the ReactiveFormsModule in the app.module.ts 
+
+To use the reactive form 
+	First on the login.component.ts 
+		Create a FormGroup 
+		and then create the fields as FormControl items with validators 
+		
+		import { FormControl, FormGroup, Validators } from '@angular/forms';
+		
+		loginForm: FormGroup;
+		
+		ngOnInit(): void {
+			this.loginForm = new FormGroup({
+			  email: new FormControl('', {validators: [Validators.required, Validators.email]}),
+			  password: new FormControl('', {validators: [Validators.required]})
+			});
+		  }
+		  
+		//to get the control names so to use with validation
+	  get loginFormControl() {
+		return this.loginForm.controls;
+	  }
+
+	Then on the login.components.html bind the formGroup to the controls/form
+		For validation use loginFormControl property to use the control Check the html for more details 
+
