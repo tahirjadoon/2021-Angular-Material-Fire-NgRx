@@ -92,6 +92,10 @@ Route 2:
 		<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 		Add the above inside the head section of src \ index.html 
 		
+	Adding Roboto Font 
+		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+		Add the above inside the head section of src \ index.html 
+		
 	Add flex layout [For usage details check prj003FitnessTracker-SignupForm] 
 		https://github.com/angular/flex-layout/wiki/Using-Angular-CLI 
 		>npm install angular/flex-layout-builds --save

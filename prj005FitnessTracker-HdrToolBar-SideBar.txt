@@ -1,0 +1,89 @@
+Open "prj004FitnessTracker-LoginForm" in file explorer and delete node_modules
+
+Copy "prj004FitnessTracker-LoginForm" and rename as "prj005FitnessTracker-HdrToolBar-SideBar"
+
+Open "prj005FitnessTracker-HdrToolBar-SideBar" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+When having both SideBar and ToolBar then add the side bar first 
+	Hint use mat-drawer-container
+
+Material Imports/Exports
+	Open the material.module.ts and import/export following 
+	* MatSidenavModule
+	* MatToolbarModule
+	* MatListModule
+
+Adding Roboto Font
+	If it is not already added then add it 
+		<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet"> 
+		Add the above inside the head section of src \ index.html 
+		
+Styling
+	check styles.css for more details
+
+Adding Side Bar 
+	https://material.angular.io/components/sidenav/overview 
+	
+	navigation items will be put together with 
+	https://material.angular.io/components/list/overview
+	
+	1. Go to app.component.html and make the changes, check the file for details. Following is sample with comments to detail
+		<!--mat-sidenav-container acts as a structural container for our content and sidenav-->
+		<mat-sidenav-container>
+			<!--mat-sidenav represents the added side content-->
+			<mat-sidenav role="navigation" #sidenav> <!--opened="true" keeps it open-->
+				<p>I am the side nav!</p>
+			</mat-sidenav>
+
+			<!--mat-sidenav-conten represents the main content-->
+			<mat-sidenav-content>
+				<!--moved the router-outlet inside mat-sidenav-content -->
+				<button (click)="sidenav.toggle()">Show side nav</button>
+				<router-outlet></router-outlet>
+			</mat-sidenav-content>
+
+		</mat-sidenav-container>
+		
+	2. 
+
+Adding Tool Bar 
+	Tool bar will be added inside mat-sidenav-content
+	
+	https://material.angular.io/components/toolbar/overview
+	
+	1.	Basic setup, check the app.component.html for details 
+		<!-- tool bar-->
+        <mat-toolbar color="primary">
+            <div><button>Toggle sidenv</button></div>
+            <div>LOGO</div>
+            <div>
+                <a routerLink="/signup">Signup</a>
+                <a routerLink="/login">Login</a>
+                <a routerLink="/training">Training</a>
+            </div>
+        </mat-toolbar>
+		
+	2. For responsiveness the tool bar links should not show on the toop bar but rather in side bar and for bigger screen then side bar button should not display.
+		Check app.component.html for details 
+	
+Finally move the items to sub components 
+
+	>ng g c Nav/sidenav-list --module app
+	>ng g c Nav/header --module app
+	
+	Check both the files for more details. 
+	Keep one thing in mind that from the child compoents will need to emit an event as an out put to toggle the menu. 
+	
+
+	
+	
+	
+	
