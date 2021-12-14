@@ -1,8 +1,8 @@
 Open "prj005FitnessTracker-HdrToolBar-SideBar" in file explorer and delete node_modules
 
-Copy "prj005FitnessTracker-HdrToolBar-SideBar" and rename as "prj005FitnessTracker-WelcomeScreen"
+Copy "prj005FitnessTracker-HdrToolBar-SideBar" and rename as "prj006FitnessTracker-WelcomeScreen"
 
-Open "prj005FitnessTracker-WelcomeScreen" in vs code 
+Open "prj006FitnessTracker-WelcomeScreen" in vs code 
 
 Run 
 

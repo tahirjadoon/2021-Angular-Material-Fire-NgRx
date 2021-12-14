@@ -1,0 +1,78 @@
+Open "prj006FitnessTracker-WelcomeScreen" in file explorer and delete node_modules
+
+Copy "prj006FitnessTracker-WelcomeScreen" and rename as "prj007FitnessTracker-Training-Tabs"
+
+Open "prj007FitnessTracker-Training-Tabs" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Add to matieria.module.ts
+	* MatTabsModule
+	* MatCardModule
+	* MatSelectModule
+	* MatProgressSpinnerModule
+	* MatDialogModule
+
+New Training	
+	We'll use card, select to pick the training that want to start
+	https://material.angular.io/components/card/api 
+	https://material.angular.io/components/select/overview 
+	
+	emit training strat so that training component can know about it
+
+Training Component
+	We'll setup the tabs to view past or current trainings
+	
+	https://material.angular.io/components/tabs/overview 
+	
+	<!--only display tabs when no ongoing training-->
+	<mat-tab-group *ngIf="!ongoingTraining">
+		<mat-tab label="New Excercise">
+			<!--new training-->
+			<app-new-training (trainingStart)="ongoingTraining = true"></app-new-training>
+		</mat-tab>
+		<mat-tab label="Past Exercises">
+			<!--past training-->
+			<app-past-trainings></app-past-trainings>
+		</mat-tab>
+	</mat-tab-group>
+
+	<!--current training only display  when ongoing training happening-->
+	<app-current-training *ngIf="ongoingTraining"></app-current-training>
+  
+	
+	We'll get notified by new training whenever a new training has started other wise we'll not show it. 
+	New training will emit an event which will be catched by training and it will make a flag true/false to display the current training or not
+
+
+Dialog Component 
+	This will be used by the current training to display cancel dialogue
+	>ng g c Site/training/current-training/stoptraining-dialogue --module app
+		It will get added to the app.module.ts. 
+		This is a special component that we'll use at run time, so add it to the entryComponents in app.module.ts as well. Check app.module.ts for details 
+			entryComponents: [StoptrainingDialogueComponent]
+		
+	check component and html for more details
+
+Current training
+	Will display spinner and current progress. 
+	User should be able to cancel the current training as well 
+	
+	Spinner: https://material.angular.io/components/progress-spinner/overview
+	
+	Displaying some motivational phrases. 
+		On load display a randon phrase 
+		Every two seconds cycle through the phrases 
+	
+	We'll display a dialog for the user to accept or cancel when STOP button is clicked. This we created above 
+	
+	
+	
+	
+	
