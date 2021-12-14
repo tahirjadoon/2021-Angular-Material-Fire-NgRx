@@ -1,0 +1,16 @@
+Open "prj005FitnessTracker-HdrToolBar-SideBar" in file explorer and delete node_modules
+
+Copy "prj005FitnessTracker-HdrToolBar-SideBar" and rename as "prj005FitnessTracker-WelcomeScreen"
+
+Open "prj005FitnessTracker-WelcomeScreen" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+Check welcome.component.html and styles.css for details. 
+
+Very straight forward. 
