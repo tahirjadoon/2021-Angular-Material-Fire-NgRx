@@ -1,8 +1,8 @@
 Open "prj006FitnessTracker-WelcomeScreen" in file explorer and delete node_modules
 
-Copy "prj006FitnessTracker-WelcomeScreen" and rename as "prj007FitnessTracker-Training-Tabs"
+Copy "prj006FitnessTracker-WelcomeScreen" and rename as "prj007FitnessTracker-Training-Tabs-Card-Spinner-Select-Dialog"
 
-Open "prj007FitnessTracker-Training-Tabs" in vs code 
+Open "prj007FitnessTracker-Training-Tabs-Card-Spinner-Select-Dialog" in vs code 
 
 Run 
 
@@ -12,7 +12,7 @@ Run
 CTRL+C to break
 ------------------------------------------------------------------------------
 
-Add to matieria.module.ts
+Add to material.module.ts
 	* MatTabsModule
 	* MatCardModule
 	* MatSelectModule
