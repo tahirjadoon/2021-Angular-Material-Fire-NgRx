@@ -1,0 +1,48 @@
+Open "prj008FitnessTracker-auth_signup_service-models-links_hide_show" in file explorer and delete node_modules
+
+Copy "prj008FitnessTracker-auth_signup_service-models-links_hide_show" and rename as "prj009FitnessTracker-Routing-Authentication-RouteProtection"
+
+Open "prj009FitnessTracker-Routing-Authentication-RouteProtection" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+We'll need to protect the routes, also do the redirection in the auth service on login and logout. 
+
+1. auth.service.ts 
+	Look into 
+		1. Injectable
+		2. constructor where the router is DI
+		3. registerUser method go to training: this.router.navigate(['/training']);
+		4. login method go to training: this.router.navigate(['/training']);
+		5. logout method go to login: this.router.navigate(['/login']);
+2. in the header wireup the logout link to call the logout method in the auth service. 
+3. in the side nav html change the method name to call onLogout()
+	The logout method here will be like 
+	onLogout(){
+		this.onSideNavClose();
+		this.authService.logout();
+	  }
+4. Route Protection
+	For this we'll need to first create the authGuard. 
+	1. Create a folder "Guards" 
+		>ng g g Guards/auth 
+			This will create a file auth.guard.ts in the Guards folder 
+			CanActivate has been placed and it will secure the route. 
+			We can also use CanLoad, this will provides the lazy loaded routes protection. It is fully explained here
+				https://www.tektutorialshub.com/angular/angular-canload-guard-example/
+	2. app.routing.module
+		Go to app.routing.module and use the guard on the routes there. 
+		Training path will become like 
+		{path: 'training', component: TrainingComponent, canActivate: [AuthGuard]}
+		
+		Important note, by doing following we dont need to add it to the providers array. It will be available as a singleton
+		@Injectable({
+		  providedIn: 'root'
+		})
+

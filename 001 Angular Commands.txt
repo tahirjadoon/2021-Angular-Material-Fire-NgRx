@@ -16,6 +16,9 @@
 >ng g c Site/auth/signup --module app
 	Create a new component in Site folder also add to the app.module.ts
 	
+>ng g g Guards/auth
+	Create a new guard in folder Guards with name auth.guard.ts 
+	
 -------------------------------
 EventEmitter as output
 	@Output() hdrSideNavToggle = new EventEmitter<void>();
