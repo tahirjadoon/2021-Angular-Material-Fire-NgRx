@@ -1,0 +1,60 @@
+Open "prj007FitnessTracker-Training-Tabs-Card-Spinner-Select-Dialog" in file explorer and delete node_modules
+
+Copy "prj007FitnessTracker-Training-Tabs-Card-Spinner-Select-Dialog" and rename as "prj008FitnessTracker-auth_signup_service-models-links_hide_show"
+
+Open "prj008FitnessTracker-auth_signup_service-models-links_hide_show" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+npm install --save rxjs-compat
+
+We are working with data. For this we'll use some services including authentication service. For now will fake the data. 
+
+Inside src / app folder create following folders and files.  
+	
+	1. Models - check code for more details
+		1. user.model.ts
+		2. auth-data.model.ts
+		
+	2. Services - check code for more details 
+		1. auth.service.ts 
+			>ng g s Services/auth
+			Imp: check use of spread operator which three dots .... It returns the new object rather than returning the reference to original object 
+			To use the service, first we'll need to tell anugular about it.
+				Also, this makes sure that we use the same instance of the service 
+				
+			go to app.module.ts and add it in providers array 
+				providers: [AuthService]
+				
+			once provided then we can inject it where ever we need it. 
+			
+			
+Other components that have a change 
+	1. signup.component.ts
+		Using the auth service register user
+	
+	2. login.component.ts
+		Using the auth service login  
+		Then we tell other parts of the app that we have logged in using RxJs observables/subject. 
+			auth service import/define subject 
+				import { Subject } from 'rxjs'; 
+				hasUserLoggedInSubject : Subject<boolean> = new Subject<boolean>();
+				
+				and then on registerUser and login methods add 
+					this.hasUserLoggedInSubject.next(true);
+				and on logout method add 
+					this.hasUserLoggedInSubject.next(false);
+					
+	3. SideNav & Header		
+			Then we need to use the subject where we need to react to the change 
+			Header and sideNav will show/hide navigation items per this subject
+				Check both component and html for details. We'll subscribe and then will show/hide the nav items accordingly
+				
+				
+			
