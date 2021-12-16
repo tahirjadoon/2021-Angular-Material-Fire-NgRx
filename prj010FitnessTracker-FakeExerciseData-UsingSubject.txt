@@ -1,0 +1,43 @@
+Open "prj009FitnessTracker-Routing-Authentication-RouteProtection" in file explorer and delete node_modules
+
+Copy "prj009FitnessTracker-Routing-Authentication-RouteProtection" and rename as "pprj010FitnessTracker-FakeExerciseData-UsingSubject"
+
+Open "prj010FitnessTracker-FakeExerciseData-UsingSubject" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+1. Preparing exercise data 
+	1. Check Models/exercise.model.ts for holding the data 
+		For the state we are only accpeting the predefined items
+			public state?: 'completed' | 'cancelled' | null
+			
+	2. A service where we will manage all the exercises along with completed and cancelled 
+		>ng g s Services/training
+			Check the training.services.ts for more details in Services folder
+			No need to put it in the providers array of the module since we are using providedIn root for the Inhectable
+			Also created some dummy exercises for now
+			Make the array private, provide a helper method to get the exercises. Make sure to return the new array rather than reference to the current array. 
+			
+	3. Use the dummy data above and use it in New Training component
+		Inject the service and then assign the available exercises to the variable 
+		Go to html and replace the hard coded exercises with dummy data using the ngFor loop
+		
+2. Setting exercise 
+	Go to training.service.ts and a method to start exercise 
+		this will set the exercise and then will emit the subject to tell the subscribers that the exercise has started
+	Also setup completeExercise and cancelExercise methods 
+
+3. Subscribe to start training event in training component 
+	Code changes in training.component.ts and training.component.html 
+	
+4. We do not need to emit from new training any more so remove all relevant code
+	Go to new-training.component.ts and overwrite the onStartTraining to utilize the training service
+	Also, create the form to submit the selected training to the onStartTraining method 
+	Display the exercise name and reset the progress
+	On cancel training do not emit the event so remove trainingStopped event

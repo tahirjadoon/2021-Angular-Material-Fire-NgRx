@@ -1,0 +1,16 @@
+<section class="current-training" 
+    fxLayout="column" 
+    fxLayoutAlign="center center">
+
+    <h1>Working on {{ runningExercise?.name }}</h1>
+    <h3>Duration {{ progressStep }} / {{ runningExercise?.duration }}</h3>
+
+    <!--when the mode is determinate then set the value as well-->
+    <mat-progress-spinner mode="determinate" [value]="progress"></mat-progress-spinner>
+    <h1>{{progress}}%</h1>
+    <p>
+        <mat-icon *ngIf="pickedMotivationIndex % 2 !== 0" color="primary">sentiment_satisfied</mat-icon>
+        <mat-icon *ngIf="pickedMotivationIndex % 2 === 0" color="primary">emoji_emotions</mat-icon>
+        {{ pickedMotivationPhrase }}</p>
+    <button mat-raised-button (click)="onStop()" color="accent">Stop</button>
+</section>>
