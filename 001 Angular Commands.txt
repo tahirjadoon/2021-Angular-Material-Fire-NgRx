@@ -30,3 +30,9 @@ EventEmitter as output
 	and then use on parent component where the child is being used 
 	<app-sidenav-list (sideNavListClose)="sidenav.close()"></app-sidenav-list>
 	
+
+Important note, by doing following we dont need to add it to the providers array. It will be available as a singleton
+		@Injectable({
+		  providedIn: 'root'
+		})
+	
