@@ -1,0 +1,86 @@
+Open "pprj010FitnessTracker-FakeExerciseData-UsingSubject" in file explorer and delete node_modules
+
+Copy "pprj010FitnessTracker-FakeExerciseData-UsingSubject" and rename as "prj011FitnessTracker-DataTable-Sorting-Filtering-Pagination"
+
+Open "prj011FitnessTracker-DataTable-Sorting-Filtering-Pagination" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+This example heavly uses material data table including sorting, pagination and filtering. 
+	do following in material.module.ts
+		import {MatTableModule} from '@angular/material/table';
+		import {MatSortModule} from '@angular/material/sort';
+		import {MatPaginatorModule} from '@angular/material/paginator';
+		
+	and then add imports and exports 
+	* MatTableModule
+	* MatSortModule
+	* MatPaginatorModule
+	
+Data table will get implemented in past trainings for both cancelled and completed. 
+
+While creating the table definitions use pipe to format the data nicesly
+	date pipe wit date 
+	number pipe with duration
+	number pipe with calories
+	titlecase pipe with state to make first char upper case
+	
+Towards the bottom of the table structure we have following. displayedColumns is defined in the past.component.ts file along with the dataSource
+	<tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+	
+	//even though we are working with ExercisesModel array, we do not defined it as []
+	dataSource = new MatTableDataSource<ExerciseModel>();
+	displayedColumns = ['date','name', 'duration', 'calories', 'state'];
+	
+in the TrainingService
+	cancelExercise(progress:number) has an update
+	add property getPastExercises
+	
+Styles.css added the following 
+	table.past-exercises {
+		width: 100%;
+	}
+	
+Sorting 
+	To the mat-table add matSort directive 
+		<table mat-table [dataSource]="dataSource" class="past-exercises mat-elevation-z8" matSort> <!--class="mat-elevation-z8"-->
+	Then to the mat-header-cell add mat-sort-header for any columns that needs to have sorting 
+		<th mat-header-cell *matHeaderCellDef mat-sort-header>Date</th>
+		
+	Then in the type script file, get reference to the matSort using viewChild
+		@ViewChild(MatSort) sort: MatSort;
+	
+	Then on AfterViewInIt attach to the dataSource 
+		this.dataSource.sort = this.sort;
+		
+Filtering
+	First we'll need to add the input and add event doFilter to it. 
+		<input matInput type="text" (keyup)="doFilter($event.target.value)">
+	Then on the typescript class 
+		@ViewChild(MatSort) sort: MatSort;
+		and in ngAfterViewInit() put
+			this.dataSource.sort = this.sort;
+		
+Pagination
+	On the html side 
+		<mat-paginator [pageSize]="5"
+						 [pageSizeOptions]="[1, 5, 10, 20]"
+						 showFirstLastButtons 
+						 aria-label="Select page of past exercises">
+		  </mat-paginator>
+	and then on the typescript class 
+		@ViewChild(MatPaginator) paginator: MatPaginator;
+		and in ngAfterViewInit() put
+			this.dataSource.paginator = this.paginator;
+			
+			
+	Then on the 
+		
+		
