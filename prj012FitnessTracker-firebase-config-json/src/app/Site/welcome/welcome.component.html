@@ -1,0 +1,29 @@
+<div class="welcome" 
+    fxLayout="column" 
+    fxLayout.gt-md="row"
+    fxLayoutGap.gt-md="20px"
+    fxLayoutAlign="center center"
+    >
+    <section>
+      <h1>ACTIVITY</h1>
+      <p>Stay active and enjoy better health and more fun!</p>
+    </section>
+    <section>
+      <h1>COMMUNITY</h1>
+      <p>Get to know other people who share your passion!</p>
+    </section>
+    <section>
+      <h1>CHALLENGES</h1>
+      <p>Never stop! Dive into new challenges every day</p>
+    </section>
+  </div>
+
+  <div class="welcome-projectinfo">
+    <div><h2>{{ firebaseConfig?.projectInfo?.name }}</h2></div>
+    <div> 
+        <mat-icon style="vertical-align: middle;" color="secondary">task_alt</mat-icon> {{ firebaseConfig?.projectInfo?.ngVersion }} 
+        <mat-icon style="vertical-align: middle;" color="accent">task_alt</mat-icon> {{ firebaseConfig?.projectInfo?.nodeVersion }} 
+        <mat-icon style="vertical-align: middle;" color="primary">task_alt</mat-icon> {{ firebaseConfig?.projectInfo?.npmVersion }} 
+        <mat-icon style="vertical-align: middle;" color="warn">task_alt</mat-icon> {{ firebaseConfig?.projectInfo?.ngMaterialVersion }}</div>
+    <div [innerHtml]="firebaseConfig?.projectInfo?.notes"></div>
+  </div>
