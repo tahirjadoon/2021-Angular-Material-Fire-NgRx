@@ -68,3 +68,9 @@ mat-form-field{
 table.past-exercises {
     width: 100%;
 }
+/*firebase warning display at top of all the pages*/
+.firebase-warning{
+    color: red; 
+    font-weight: bold;
+}
+

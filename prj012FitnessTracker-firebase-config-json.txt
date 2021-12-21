@@ -74,7 +74,8 @@ Welcome Page
 			<div [innerHtml]="firebaseConfig?.projectInfo?.notes"></div>
 		  </div>
 	
-
+App Component
+	Display warning message in red when the FireBase Config is missing
 
 
 
