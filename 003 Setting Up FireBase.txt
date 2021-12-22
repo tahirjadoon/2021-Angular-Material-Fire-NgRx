@@ -1,0 +1,148 @@
+FireBase: a backend DB
+AngularFire2: A third party package that is a connector to a FireBase 
+
+Data used for setting up FireBase database 
+	ProjectName: ng-fitness-tracker-2b3a5
+	Collection: availableExercises [this is MasterData]
+				#1:autoId: HBQ95LHCUlIwVXRvIiKU
+					name: Crunches 
+					duration: 30
+					calories: 8
+				#2: autoID: bW64Tn1pw9me6TwVNygQ
+					name: Touch Toes 
+					duration: 180
+					calories: 15
+				#3: autoID: acQnc6fWKcCfsyLgAZd5
+					name: Side Lunges 
+					duration: 120
+					calories: 18
+				#4: autoID: ArSHEeFFr8fRSgmCGlCI
+					name: Burpees 
+					duration: 60
+					calories: 8
+				
+
+Firebase Account Setup
+	Go to FireBase and login with your account 
+	https://firebase.google.com/  
+
+	Click on GetStarted button in the middle 
+
+	IMPORTANT: We'll be using "Cloud Firestore" and "Authentication"
+
+	1. Next Create  a project 
+		
+		1. Name the project: 2021-ng-fitness-tracker
+		2. Befre clicking continue pick the project name. In my case it is "ng-fitness-tracker-2b3a5"
+		3. Accept the terms 
+		4. Click continue
+		
+	2. Left the "Enable Google Analytics for this project" selected
+		1. Click Continue
+
+	3. Select region
+		1. Accept  terms 
+		2. Click Create Project button 
+		
+	4. It will create the project, a message will display
+		1. Click Continue 
+		
+	5. A firebase console will show
+		Authentication and Cloud FireStore should be showing for you by default. 
+		
+	6. Click on the "Build" and drop down menu will appear 
+		1. Click FireStore Database
+			1. Click to "Create database"
+			2. Select "Start in test mode". later we'll switch along with the rules 
+				test mode rules are generous 
+					rules_version = '2';
+					service cloud.firestore {
+					  match /databases/{database}/documents {
+						match /{document=**} {
+						  allow read, write: if
+							  request.time < timestamp.date(2022, 1, 19);
+						}
+					  }
+					}
+				Click next 
+			3. It will ask you for the Cloud Fire store Location. I left it as nam5 (us-centeral). This cannot be changed later 
+				Click Enable 
+			4. You should see Cloud Fire Store. You should see Data, Rules, Indexes, Usage
+			5. Create first collection
+				1. click "Start Collection" 
+				2. Provide the collection name, in this case "availableExercises" and clieck next 
+					a. Click on Auto-Id to generate the ID: HBQ95LHCUlIwVXRvIiKU
+					and then provide key/value pairs per the availableExercises array that we have 
+						i. name = string = Crunches
+						ii. duration = number = 30
+						iii. calories = number = 8
+						Click Save and this makes the first document 
+				3. Click Save [Follow and setup data as per master data above, 4 lines]
+			
+		
+AngularFire And Fire Base
+	AngularFire acts as a bridge between FireBase and the App. 
+	It is an Observable-based "Data Streams" 
+	
+		Observable 
+			Wraps Callback "Htttp Request"
+			Invokes next(), error(), complete()
+			This is streams of data 
+			Can use operators e.g map (rxjs library)
+		
+		Observer
+			has methodes next(), error(), complete()
+	
+	Go to 
+	https://github.com/angular/angularfire 
+	https://github.com/angular/angularfire/blob/master/docs/install-and-setup.md
+		It has setup and sample usage information 
+		
+		>npm i firebase --save
+		>npm i @angular/fire --save
+			 
+	Go to your Firebase console and then to your project and the click on project overview 
+		Under get started click the WEB APP icon
+			Register the app by providing the name "ng-fitness-tracker" click Register 
+			It will give the info for all above 
+			
+
+			 
+Add fire base specific config to the environment.ts file 
+		/src/environments/environment.ts
+		/src/environments/environment.prod.ts
+		
+		fireBaseCollectionNames: {
+			availableExercises: "availableExercises"
+		},
+		firebase: {
+			apiKey: '<your-key>',
+			authDomain: '<your-project-authdomain>',
+			databaseURL: '<your-database-URL>',
+			projectId: '<your-project-id>',
+			storageBucket: '<your-storage-bucket>',
+			messagingSenderId: '<your-messaging-sender-id>',
+			appId: '<your-app-id>',
+			measurementId: '<your-measurement-id>'
+		  }
+
+		[IMPORTANT] My check ins will be with firebase blank entries
+				
+
+Setup @NgMdule for the AngularFireModule in app.module.ts
+	import { AngularFireModule } from '@angular/fire/compat';
+	import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+	
+	also import the environment file 
+	import { environment } from '../environments/environment';
+	
+	and then add to the imports array. You'll need to execute a method AngularFireModule 
+	AngularFireModule.initializeApp(environment.firebase)
+	AngularFirestoreModule
+	
+Sample Fetching the data check "prj012FitnessTracker-firebase-config-json.txt"
+	
+	
+	
+	
+	

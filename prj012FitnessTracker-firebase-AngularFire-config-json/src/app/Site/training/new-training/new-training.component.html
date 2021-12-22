@@ -11,7 +11,7 @@
                 <mat-form-field> <!--appearance="fill"-->
                     <mat-label>Choose exercise</mat-label>
                     <mat-select ngModel name="exercise" required>
-                      <mat-option *ngFor="let exercise of exercises; let i = index" [value]="exercise.id">
+                      <mat-option *ngFor="let exercise of exercises | async; let i = index" [value]="exercise.name">
                         {{i+1}} - {{exercise.name}} - {{ exercise.duration }}
                       </mat-option>
                     </mat-select>

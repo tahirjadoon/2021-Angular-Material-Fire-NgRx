@@ -4,6 +4,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
+//angular fire 
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+
 //feature modules
 import { MaterialModule } from './Modules/material.module';
 
@@ -23,6 +27,10 @@ import { SidenavListComponent } from './Nav/sidenav-list/sidenav-list.component'
 import { StoptrainingDialogueComponent } from './Site/training/current-training/stoptraining-dialogue/stoptraining-dialogue.component';
 
 import { AuthService } from './Services/auth.service';
+
+//get the environments file 
+import { environment } from '../environments/environment';
+
 
 @NgModule({
   declarations: [
@@ -45,7 +53,9 @@ import { AuthService } from './Services/auth.service';
     MaterialModule,
     FlexLayoutModule, 
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    AngularFireModule.initializeApp(environment.firebase), 
+    AngularFirestoreModule
   ],
   providers: [AuthService],
   bootstrap: [AppComponent],

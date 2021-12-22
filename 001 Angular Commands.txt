@@ -35,4 +35,13 @@ Important note, by doing following we dont need to add it to the providers array
 		@Injectable({
 		  providedIn: 'root'
 		})
-	
+
+Link
+	auth guard else part to pass in the return url to the login page 
+		this.router.navigate(['/login'], {
+          queryParams: {
+            return: state.url
+          }
+        });
+	a tag 
+		<a routerLink="/training">Training</a>

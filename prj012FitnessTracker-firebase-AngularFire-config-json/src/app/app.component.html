@@ -12,10 +12,9 @@
         <!--child compotent-->
         <app-header (hdrSideNavToggle)="sidenav.toggle()"></app-header>
 
-        <div *ngIf="warningText !== ''" fxLayout fxLayoutAlign="center" class="firebase-warning">
-            {{ warningText }}. 
+        <div *ngIf="warningText !== ''" fxLayout fxLayoutAlign="center" class="firebase-warning" [innerHtml]="warningText">
         </div>
-
+        
         <!-- main content-->
         <main>
             <!--moved the router-outlet inside mat-sidenav-content -->

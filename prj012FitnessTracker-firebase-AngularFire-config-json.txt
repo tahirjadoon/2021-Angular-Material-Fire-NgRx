@@ -1,0 +1,143 @@
+Open "prj011FitnessTracker-DataTable-Sorting-Filtering-Pagination" in file explorer and delete node_modules
+
+Copy "prj011FitnessTracker-DataTable-Sorting-Filtering-Pagination" and rename as "prj012FitnessTracker-firebase-AngularFire-config-json.txt"
+
+Open "prj012FitnessTracker-firebase-AngularFire-config-json.txt" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Must read "003 Setting Up FireBase.txt" to setup before doing below
+* FireBase
+* AngularFire
+
+Project related information is in environment.ts and environment.prod.ts file, check "003 Setting Up FireBase.txt" for more details. 
+
+firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>',
+    appId: '<your-app-id>',
+    measurementId: '<your-measurement-id>'
+  }
+
+------------------------------------------------------------------------------
+
+We'll be working with FireBase to store the data. Check above "003 Setting Up FireBase.txt" for details under AngularFire
+
+Check app.compoent.ts and .html for displaying the error message when fireBase config is missing from environment.ts file
+
+Getting the data 
+	Go to new-trainng.component.ts 
+		Inject firestore 
+			import { AngularFirestore } from '@angular/fire/compat/firestore';
+			constructor(private trainingService: TrainingService, private dbFireStore: AngularFirestore) { }
+		Get and log the data - sample 1 
+			this.dbFireStore.collection('availableExercises').valueChanges().subscribe(result => {
+			  console.log(result);
+			});
+			
+			you'll see following which is coming from the fireBase db
+				[
+					{ "name": "Burpees","calories": 8,"duration": 60 },
+					{ "name": "Crunches","duration": 30,"calories": 8 },
+					{ "calories": 18,"duration": 120,"name": "Side Lunges" },
+					{ "duration": 180,"calories": 15,"name": "Touch Toes" }
+				]
+		Get data - sample 2
+			Change following to observable 
+				Current
+					exercises: ExerciseModel[] = [];
+				To 
+					for this 
+						import { Observable } from 'rxjs'; 
+						exercises: Observable<any>; 
+					and then this in ngOnInIT
+						this.exercises = this.dbFireStore.collection('availableExercises').valueChanges();
+				
+	Since above we changed the exercises to fetched data from FireBase, we'll need to use the Async pipe 
+		Go to new-training.component.html and change to 
+			<mat-option *ngFor="let exercise of exercises | async; let i = index" [value]="exercise.name">
+		you won't be able to select any thing in the drop down since we are not getting the "id" back from the DB due to use of .valueChanges() method. It strips some data
+		
+	CollectionNames have been moved to the environment.ts as well 
+
+
+##################################################################################################################
+######## BELOW IS NOT USED, you can still check out how json can be read and then utilized. Code is there. #######
+##################################################################################################################
+
+In this project we'll cretae a json config that will house the settings. We'll need these when making the http calls. 
+
+The json is in Config/firbase-config.json
+
+	logins-site section are the registered users per my setup. I have put these here so to remember easly. 
+
+	firebase section will get filled after setting up the FireBase account. In my code this section will not get checked in so add as per your needs. 
+
+	{
+		"logins-site": [
+			{
+				"userid": "t@t.com",
+				"password": "dec122021",
+				"type": "simple"
+			},
+			{
+				"userid": "t2@t.com",
+				"password": "dec122021",
+				"type": "simple"
+			}
+		],
+		"firebase": {
+			"backEndUrl": "",
+			"backEndApiKey": "",
+			"backEndAuthDomain": ""
+		}
+	}
+
+IMPORTANT:
+	open tsconfig.json and add following to compiler options
+		"resolveJsonModule": true
+		"allowSyntheticDefaultImports": true
+
+Model
+	create model classes per the json structure above. Check Model/firebase-config.model.ts
+
+Service
+	Create a service in Services/read-config.service.ts to read the file ad fill FireBaseConfigModel
+	Also create a property getFirebaseConfig to access the info. 
+
+Welcome Page 
+	Go to welcome typescript class and get the config info 
+		firebaseConfig: FireBaseConfigModel = <FireBaseConfigModel>{}
+		
+		and then ngOnInit
+			//get the config info 
+			this.firebaseConfig = this.readConfigService.getFirebaseConfig;
+			
+	Go to the welcome html page and display the project info 
+	
+		<div class="welcome-projectinfo">
+			<div><h2>{{ firebaseConfig?.projectInfo?.name }}</h2></div>
+			<div> 
+				<mat-icon style="vertical-align: middle;" color="secondary">task_alt</mat-icon> {{ firebaseConfig?.projectInfo?.ngVersion }} 
+				<mat-icon style="vertical-align: middle;" color="accent">task_alt</mat-icon> {{ firebaseConfig?.projectInfo?.nodeVersion }} 
+				<mat-icon style="vertical-align: middle;" color="primary">task_alt</mat-icon> {{ firebaseConfig?.projectInfo?.npmVersion }} 
+				<mat-icon style="vertical-align: middle;" color="warn">task_alt</mat-icon> {{ firebaseConfig?.projectInfo?.ngMaterialVersion }}</div>
+			<div [innerHtml]="firebaseConfig?.projectInfo?.notes"></div>
+		  </div>
+
+[COMMENTED]	
+App Component
+	Display warning message in red when the FireBase Config is missing
+
+
+
