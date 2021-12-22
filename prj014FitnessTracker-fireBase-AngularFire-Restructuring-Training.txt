@@ -1,0 +1,113 @@
+Open "prj013FitnessTracker-fireBase-AngularFire-Using-SnapshotChanges.txt" in file explorer and delete node_modules
+
+Copy "prj013FitnessTracker-fireBase-AngularFire-Using-SnapshotChanges.txt" and rename as "prj014FitnessTracker-fireBase-AngularFire-Restructuring-Training"
+
+Open "prj014FitnessTracker-fireBase-AngularFire-Restructuring-Training" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Must read "003 Setting Up FireBase.txt" to setup before doing below
+* FireBase
+* AngularFire
+
+Project related information is in environment.ts and environment.prod.ts file, check "003 Setting Up FireBase.txt" for more details. 
+Update following in your environment file
+
+firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>',
+    appId: '<your-app-id>',
+    measurementId: '<your-measurement-id>'
+  }
+
+------------------------------------------------------------------------------
+
+ We'll restrucutre the code here since the exercises array needs to be added to the training service for all other pages to work properly. 
+ 
+ TrainingService
+	availableExercises in TrainingService is not any more relevant since that is static data. 
+	Comment out the original static array and chnage it with 
+		private availableExercises: ExerciseModel[] = [];
+		
+	Update getAvailableExercises to fetch data for this need to have the following imports 
+		import { AngularFirestore } from '@angular/fire/compat/firestore';
+		import { map } from 'rxjs';
+		import { environment } from '../../environments/environment';
+	
+	Then inject the AngularFireStore 
+		constructor(private dbFireStore: AngularFirestore) {} 
+		
+	We'll fetch and fire an event to tell new training that we have data 
+	
+	Create a subject 
+		exercisesFetchedSubject: Subject<ExerciseModel[]> = new Subject<ExerciseModel[]>();
+		
+	and then change getAvailableExercises to 
+		getAvailableExercises(){
+			this.dbFireStore
+			.collection(environment.fireBaseCollectionNames.availableExercises)
+			.snapshotChanges()
+			.pipe(
+			  map(docArray => { //map rxjs operator
+				return docArray.map(doc => { //using javascript map to map array to ExerciseModel
+				  return {
+					id: doc.payload.doc.id, 
+					...doc.payload.doc.data() as ExerciseModel
+				  };
+				});
+			  })
+			)
+			.subscribe((exercises: ExerciseModel[]) => {
+			  //assign
+			  this.availableExercises = exercises;
+			  //fire exercisesFetchedSubject event 
+			  this.exercisesFetchedSubject.next([...this.availableExercises]);
+			});
+		  }
+
+new-training 
+	Change the exercises back to original form
+		From 
+			exercises: Observable<ExerciseModel[]>;
+		To
+			exercises: ExerciseModel[] = [];
+			
+	Comment or remove the current fetching of data, the whole code in ngonit 
+
+	Import
+		import { Subscription } from 'rxjs';
+		
+	Remove from constructor 
+		private dbFireStore: AngularFirestore
+	
+	Create a subscription 
+		exercisesFetchedSubscription: Subscription; 
+		
+	and then in ngOnInIt
+		//subscribe to exercisesFetchedSubject
+		this.exercisesFetchedSubscription = this.trainingService.exercisesFetchedSubject.subscribe(exercises => {
+		  this.exercises = exercises;
+		});
+		//get the data 
+		this.trainingService.getAvailableExercises();
+	
+	and finally in ngOnDestroy
+		if(this.exercisesFetchedSubscription) this.exercisesFetchedSubscription.unsubscribe();
+		
+new training html 
+	go to html and 
+	
+	1. remove the async pipe as that is not needed any more 
+	2. change the exercise.name to exercise.id
+	
+	<mat-option *ngFor="let exercise of exercises | async; let i = index" [value]="exercise.name">
