@@ -1,0 +1,109 @@
+Open "prj012FitnessTracker-firebase-AngularFire-config-json.txt" in file explorer and delete node_modules
+
+Copy "prj012FitnessTracker-firebase-AngularFire-config-json.txt" and rename as "prj013FitnessTracker-fireBase-AngularFire-Using-SnapshotChanges"
+
+Open "prj013FitnessTracker-fireBase-AngularFire-Using-SnapshotChanges" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Must read "003 Setting Up FireBase.txt" to setup before doing below
+* FireBase
+* AngularFire
+
+Project related information is in environment.ts and environment.prod.ts file, check "003 Setting Up FireBase.txt" for more details. 
+Update following in your environment file
+
+firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>',
+    appId: '<your-app-id>',
+    measurementId: '<your-measurement-id>'
+  }
+
+------------------------------------------------------------------------------
+
+Rather than using .valueChanges() to get the data we'll use .snapshotChanges(). Following logs the id and the data 
+	
+Different uses with results
+	
+	1. 
+		this.dbFireStore
+				.collection(environment.fireBaseCollectionNames.availableExercises)
+				.snapshotChanges()
+				.subscribe(result => {
+				  for(const r of result){
+					console.log(r.payload.doc.id, r.payload.doc.data());
+				  }
+				});
+
+		and this results in 
+
+		ArSHEeFFr8fRSgmCGlCI => {"name": "Burpees","duration": 60,"calories": 8} 
+		HBQ95LHCUlIwVXRvIiKU => {"name": "Crunches","duration": 30,"calories": 8}
+		acQnc6fWKcCfsyLgAZd5 => {"name": "Side Lunges","calories": 18,"duration": 120}
+		bW64Tn1pw9me6TwVNygQ => {"duration": 180,"calories": 15,"name": "Touch Toes"}
+
+	2.	Using the map operator map the result to the ExerciseModel 
+
+		this.dbFireStore
+				.collection(environment.fireBaseCollectionNames.availableExercises)
+				.snapshotChanges()
+				.pipe(
+				  map(docArray => { //map rxjs operator
+					return docArray.map(doc => { //using javascript map to map array to ExerciseModel
+					  return {
+						id: doc.payload.doc.id, 
+						...doc.payload.doc.data() as ExerciseModel
+					  };
+					});
+				  })
+				)
+				.subscribe(result => {
+				  console.log(result);
+				});
+
+		and this results in 
+
+		[
+			{"id": "ArSHEeFFr8fRSgmCGlCI","name": "Burpees","duration": 60,"calories": 8},
+			{"id": "HBQ95LHCUlIwVXRvIiKU","calories": 8,"duration": 30,"name": "Crunches"},
+			{"id": "acQnc6fWKcCfsyLgAZd5","calories": 18,"name": "Side Lunges","duration": 120},
+			{"id": "bW64Tn1pw9me6TwVNygQ","duration": 180,"calories": 15,"name": "Touch Toes" }
+		]
+		
+	3. Assigning to the exercises 
+	
+		First update the exercises definition
+		exercises: Observable<ExerciseModel[]>;
+		
+		and then 
+		
+		this.exercises = this.dbFireStore
+			.collection(environment.fireBaseCollectionNames.availableExercises)
+			.snapshotChanges()
+			.pipe(
+			  map(docArray => { //map rxjs operator
+				return docArray.map(doc => { //using javascript map to map array to ExerciseModel
+				  return {
+					id: doc.payload.doc.id, 
+					...doc.payload.doc.data() as ExerciseModel
+				  };
+				});
+			  })
+			);
+			
+		go back to the html and change the value to id 
+		
+		<mat-option *ngFor="let exercise of exercises | async; let i = index" [value]="exercise.id">
+		
+		
