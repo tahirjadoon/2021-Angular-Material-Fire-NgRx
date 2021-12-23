@@ -20,6 +20,9 @@ Data used for setting up FireBase database
 					name: Burpees 
 					duration: 60
 					calories: 8
+					
+	IMPORTANT: you do not have create the collection/document on the fireBase. We pushed the cancel and complete exercise and the collection/document got created on the fly. 
+		Check prj015FitnessTracker-fireBase-AngularFire-Storing-CancelCompleted-DataTable-Wireup.txt for details. 
 				
 
 Firebase Account Setup
@@ -78,7 +81,6 @@ Firebase Account Setup
 						iii. calories = number = 8
 						Click Save and this makes the first document 
 				3. Click Save [Follow and setup data as per master data above, 4 lines]
-			
 		
 AngularFire And Fire Base
 	AngularFire acts as a bridge between FireBase and the App. 
@@ -113,7 +115,8 @@ Add fire base specific config to the environment.ts file
 		/src/environments/environment.prod.ts
 		
 		fireBaseCollectionNames: {
-			availableExercises: "availableExercises"
+			availableExercises: "availableExercises",
+			finishedExercises: "finishedExercises"
 		},
 		firebase: {
 			apiKey: '<your-key>',

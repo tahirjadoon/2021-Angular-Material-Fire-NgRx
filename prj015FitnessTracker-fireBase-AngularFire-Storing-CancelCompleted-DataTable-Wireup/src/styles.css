@@ -1,0 +1,76 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+html, body{
+    font-family: 'Roboto', sans-serif;
+    height: 100%;
+}
+
+body{
+    margin: 0;
+}
+
+/*sidenav styling*/
+mat-sidenav-container, 
+mat-sidenav, 
+mat-sidenav-content{
+    height: 100%;
+}
+mat-sidenav{
+    width: 250px;
+}
+/*
+nav styling - targetted styling
+https://techbrij.com/css-selector-adjacent-child-sibling
+*/
+ul.navigation-items{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+mat-toolbar a{
+    text-decoration: none;
+    color: white;
+}
+mat-toolbar a:hover, 
+mat-toolbar a:active{
+    color: lightgray;
+}
+.nav-caption{
+    display: inline-block;
+    padding-left: 6px;
+}
+
+mat-form-field{
+    width: 300px;
+}
+
+/*welcome screen*/
+.welcome{
+    text-align: center;
+}
+.welcome-projectinfo{
+    text-align:left;
+    margin: 30px;
+    padding-top: 10px;
+    border-top: 1px solid gray;
+}
+.welcome-projectinfo > div{
+    padding-bottom: 5px;
+}
+
+/*training*/
+.new-training,
+.current-training{
+    padding: 30px;
+}
+
+table.past-exercises {
+    width: 100%;
+}
+/*firebase warning display at top of all the pages*/
+.firebase-warning{
+    color: red; 
+    font-weight: bold;
+}
+

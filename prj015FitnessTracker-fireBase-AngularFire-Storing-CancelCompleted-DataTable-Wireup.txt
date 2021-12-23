@@ -1,0 +1,90 @@
+Open "prj014FitnessTracker-fireBase-AngularFire-Restructuring-Training.txt" in file explorer and delete node_modules
+
+Copy "prj014FitnessTracker-fireBase-AngularFire-Restructuring-Training.txt" and rename as "prj015FitnessTracker-fireBase-AngularFire-Storing-CancelCompleted-DataTable-Wireup"
+
+Open "prj015FitnessTracker-fireBase-AngularFire-Storing-CancelCompleted-DataTable-Wireup" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Must read "003 Setting Up FireBase.txt" to setup before doing below
+* FireBase
+* AngularFire
+
+Project related information is in environment.ts and environment.prod.ts file, check "003 Setting Up FireBase.txt" for more details. 
+Update following in your environment file
+
+firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>',
+    appId: '<your-app-id>',
+    measurementId: '<your-measurement-id>'
+  }
+
+------------------------------------------------------------------------------
+
+Go to environment.ts and create a new collection name: finishedExercises
+	fireBaseCollectionNames: {
+	  availableExercises: "availableExercises",
+		finishedExercises: "finishedExercises"
+	  }
+	IMPORTANT: when you don't create the document or field in collection insde firebase then it will get created for you on the fly. 
+
+TrainingService add a new method "addDataToDatabase" to push the data to the database and call it in inside the cancelExerciise and CompeteExercise. 
+
+
+
+Start the app and run an exercise, eiter finish or stop and then check the database. It should be there. 
+	private addDataToDatabase(exercise: ExerciseModel){
+		//gives back a promise which is then or catch
+		this.dbFireStore.collection(environment.fireBaseCollectionNames.finishedExercises).add(exercise);
+	  }
+	  
+	calories:0.64(number)
+	date: December 22, 2021 at 11:15:05 PM UTC-5
+	duration: 4.8
+	id: "ArSHEeFFr8fRSgmCGlCI" [ID of the exercise]
+	name: "Burpees"
+	state: "cancelled"
+
+Now, past exercises need to display the data from the database. It is using getPastExercises property in the TrainingService.
+	First create the subject 
+		pastExercisesSubject: Subject<ExerciseModel[]> = new Subject<ExerciseModel[]>();
+		
+	Change the getPastExercises from property to method. 
+		get past finishedExercises and then emit a subject 
+			getPastExercises(){
+				this.dbFireStore
+					.collection(environment.fireBaseCollectionNames.finishedExercises)
+					.valueChanges() //gives us the record without the record id which is goot in this case. Otherwise use the same as getAvailableExercises method
+					.subscribe((exercises: ExerciseModel[]) => {
+					  //fire exercisesFetchedSubject event 
+					  this.pastExercisesSubject.next([...exercises]);
+					});
+			  }
+Next go the past-trainings.component.ts 
+	Create a subscription 
+		pastExerciesSubscription: Subscription;
+	and then on ngInIt call the method and subscribe to the subject as well 
+		this.pastExerciesSubscription = this.trainingService.pastExercisesSubject.subscribe(
+		  (pastExercises: ExerciseModel[]) => {
+			this.dataSource.data = pastExercises;
+		});
+		this.trainingService.getPastExercises();
+
+	Then onNgDestroy unsubscribe 
+		if(this.pastExerciesSubscription) this.pastExerciesSubscription.unsubscribe();
+		
+And finally in past-trainings.component.html use .toDate() function with date. 
+	<td mat-cell *matCellDef="let element"> {{element.date.toDate() | date}} </td>
+	
+Run the app and past exercises should display

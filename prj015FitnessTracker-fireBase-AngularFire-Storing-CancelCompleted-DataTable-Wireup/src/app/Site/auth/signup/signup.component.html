@@ -1,0 +1,44 @@
+<!-- using form template driven approach -->
+<section>
+    <form fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="10px" #f="ngForm" (ngSubmit)="onFormSubmit(f)" >
+        <!--hint provided in two different ways-->
+
+        <mat-form-field hintLabel="Type in valid email address">
+            <mat-label>Email</mat-label>
+            <!--email and required directives added-->
+            <input name="email" type="email" matInput placeholder="Your email" ngModel email required #emailInput="ngModel">
+
+            <mat-error *ngIf="emailInput.touched && emailInput.hasError('required')">Email is required</mat-error>
+            <mat-error *ngIf="emailInput.touched && !emailInput.hasError('required') && emailInput.hasError('email')">Email is invalid</mat-error>
+
+        </mat-form-field>
+
+        <mat-form-field hintLabel="Should be atleast 6 characters long">
+            <mat-label>Password</mat-label>
+            <!--required, maxLength and minLength directives added-->
+            <input name="password" type="password" matInput placeholder="Your password" ngModel required  minlength="6" maxlength="15" #pwInput="ngModel">
+            <mat-hint align="end"> {{ pwInput.value?.length }} / 15</mat-hint>
+
+            <mat-error *ngIf="pwInput.touched && pwInput.hasError('required')">Password is required</mat-error>
+            <mat-error *ngIf="pwInput.touched && !pwInput.hasError('required') && !pwInput.hasError('maxlength') && pwInput.hasError('minlength')">Password must be atleast 6 characters long</mat-error>
+            <mat-error *ngIf="pwInput.touched && !pwInput.hasError('required') && !pwInput.hasError('minlength') && pwInput.hasError('maxlength')">Password cannot exceed 15 characters</mat-error>
+
+        </mat-form-field>
+
+        <mat-form-field > <!--appearance="fill"-->
+            <mat-label>Birth Date</mat-label>
+            <!--limit to 18 years-->
+            <!--maxDate is in type script class-->
+            <input matInput [matDatepicker]="picker" placeholder="Your birthdate" [max]="maxDate" ngModel name="birthDate" required #birthDatePicker="ngModel"> 
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+            <mat-error *ngIf="birthDatePicker.touched && birthDatePicker.hasError('required')">Birth date is required</mat-error>   
+        </mat-form-field>
+
+        <!--checkbox works stand alone, do not wrap inside mat-form-field-->
+        <mat-checkbox ngModel name="agree" required #agreeCheckbox="ngModel" color="primary">Agree to Terms and Conditions</mat-checkbox>
+        <mat-error *ngIf="agreeCheckbox.touched && agreeCheckbox.hasError('required')">Must agree to Terms and Conditions</mat-error>   
+
+        <button type="submit" mat-raised-button color="primary" [disabled]="f.invalid">Submit</button>
+    </form>
+</section>
