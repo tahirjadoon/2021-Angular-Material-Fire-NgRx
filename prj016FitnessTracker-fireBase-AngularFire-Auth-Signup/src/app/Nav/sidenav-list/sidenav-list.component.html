@@ -1,0 +1,24 @@
+<mat-nav-list>
+    <!--Signup-->
+    <a mat-list-item routerLink="/signup" (click)="onSideNavClose()" *ngIf="!isUserAuthenticated"> <!--sidenav.close()-->
+        <mat-icon>person_add</mat-icon><!--exit_to_app-->
+        <span class="nav-caption">Signup</span>
+    </a>
+    <a mat-list-item routerLink="/login" (click)="onSideNavClose()" *ngIf="!isUserAuthenticated"><!--sidenav.close()-->
+        <mat-icon>input</mat-icon>
+        <span class="nav-caption">Login</span>
+    </a>
+    <a mat-list-item routerLink="/training" (click)="onSideNavClose()" *ngIf="isUserAuthenticated"><!--sidenav.close()-->
+        <mat-icon>fitness_center</mat-icon>
+        <span class="nav-caption">Training</span>
+    </a>
+
+    <mat-list-item>
+        <button mat-icon-button (click)="onLogout()" *ngIf="isUserAuthenticated"><!--sidenav.close()-->
+            <mat-icon>eject</mat-icon>
+            <span *ngIf="loggedInUser && loggedInUser.email" class="nav-caption">{{ loggedInUser.email }}&nbsp;</span>
+            <span class="nav-caption">Logout</span>
+        </button>
+    </mat-list-item>
+    
+</mat-nav-list>

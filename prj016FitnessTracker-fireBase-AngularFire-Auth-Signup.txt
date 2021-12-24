@@ -1,0 +1,223 @@
+Open "prj015FitnessTracker-fireBase-AngularFire-Storing-CancelCompleted-DataTable-Wireup.txt" in file explorer and delete node_modules
+
+Copy "prj015FitnessTracker-fireBase-AngularFire-Storing-CancelCompleted-DataTable-Wireup.txt" and rename as "prj016FitnessTracker-fireBase-AngularFire-Auth-Signup"
+
+Open "prj016FitnessTracker-fireBase-AngularFire-Auth-Signup" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Must read "003 Setting Up FireBase.txt" to setup before doing below
+* FireBase
+* AngularFire
+
+Project related information is in environment.ts and environment.prod.ts file, check "003 Setting Up FireBase.txt" for more details. 
+Update following in your environment file
+
+firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>',
+    appId: '<your-app-id>',
+    measurementId: '<your-measurement-id>'
+  }
+
+------------------------------------------------------------------------------
+
+Auth config must be enabled, check "003 Setting Up FireBase.txt" for details 
+
+Add to app.module 
+	import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+	and then to imports 
+		AngularFireAuthModule
+
+AuthService 
+	Inject 
+		private fireAuth: AngularFireAuth
+		
+	Change the register method to push the registration to FireBase. Using the app register and you should see the registration under Authentication ==> Users in firebase console. 
+	
+	Also change the login method to use firebase to do the login
+		
+	One more change will not store the user AuthService. So refactoring is needed. Check the AuthService for more details 
+	
+	On signup, redirect the user to the login. Also put title on login and signup html to make these stand out
+		Also on signup page put a link to the login page for registered users 
+			And if the user is logged in then manuuly going to login or signup should redirect to trainng
+				This will be done in login component and signup component 
+				
+	Logout make sure to signout of FireStore as well. The reason being to discard the auth token that FireStore has it behind the scenes. 
+		this.fireAuth.signOut();
+	
+Training Service	
+	On logout we'll get error since we have subscriptions to the data. Go to Training service and where we work with firebase, put an error routine there as well. 
+		also the subscriptioon has been changed to use the new syntex
+		
+		#1: 
+		getAvailableExercises(){
+			this.dbFireStore
+			.collection(environment.fireBaseCollectionNames.availableExercises)
+			.snapshotChanges()
+			.pipe(
+			  map(docArray => { //map rxjs operator
+				return docArray.map(doc => { //using javascript map to map array to ExerciseModel
+				  return {
+					id: doc.payload.doc.id, 
+					...doc.payload.doc.data() as ExerciseModel
+				  };
+				});
+			  })
+			)
+			.subscribe({
+			  next: (exercises: ExerciseModel[]) => {
+				//assign
+				this.availableExercises = exercises;
+				//fire exercisesFetchedSubject event 
+				this.exercisesFetchedSubject.next([...this.availableExercises]);
+			  },
+			  error: (e) => {
+				console.log(e);
+			  },
+			  complete: () => {
+
+			  }
+			});
+		}
+	
+		#2:
+		getPastExercises(){
+			this.dbFireStore
+				.collection(environment.fireBaseCollectionNames.finishedExercises)
+				.valueChanges() //gives us the record without the record id which is goot in this case. Otherwise use the same as getAvailableExercises method
+				.subscribe({
+				  next:  (exercises: ExerciseModel[]) => {
+				  //fire exercisesFetchedSubject event 
+				  this.pastExercisesSubject.next([...exercises]);
+				  },
+				  error: (e) => {
+					console.log(e);
+				  },
+				  complete: () => {
+					
+				  }
+				});
+		}
+		
+		Hiding the errors is not that good of a technique. Rather unsubscribe. Check both above methods in the Training Service for more details. 
+			Create an array of subscriptioons
+				private fireBaseSubscriptions: Subscription[] = [];
+			and thes push the #1 and #2 into this 
+				this.fireBaseSubscriptions.push(...);
+				
+			Then add a new method to cancelSubscriptions to unsubscribe 
+				cancelDBSubscriptions(){
+					if(this.fireBaseSubscriptions){
+					  this.fireBaseSubscriptions.forEach(dbSub => dbSub.unsubscribe());
+					}
+				}
+			Then inject the training service in auth service and call the method on Logout
+					logout(){
+						this.trainingService.cancelDBSubscriptions();
+						
+Auth Service 
+	in logout and authSuccessfull we are emitting hasUserLoggedInSubject. Instead we can use observables provided by AngularFire. 
+	
+	Create a new method 
+		initAuthListener(){
+			//status will change when ever we login or logout
+			this.fireAuth.authState.subscribe({
+			  next: (user) => {
+				if(user){
+				  this.authSuccessful();
+				}
+				else{
+				  this.logoutFull();
+				}
+			  },
+			  error: (e) => {}, 
+			  complete: () => {}
+			});
+		  }
+		  
+	Divide logout into two methods, the full willbe called by above 
+		logout(){
+			this.fireAuth.signOut();
+		  }
+		  private logoutFull(){
+			this.trainingService.cancelDBSubscriptions();
+			this.isUserAuthenticated = false;
+			//let the app know that auth is successful
+			this.hasUserLoggedInSubject.next(false);
+			//redirect to training
+			this.router.navigate(['/login']);
+		  }
+
+	and remove the following line from login 
+		this.authSuccessful();
+		
+	finally go to the app.Component.ts and call the method on ngOnInIt
+		//Call the method that subscribes to the FireBase auth changes 
+		this.authService.initAuthListener();
+		
+	Have also displayed the logged in users email. Check authservice, header and sidenav components
+
+Training Component
+	Use the new subscription syntex 
+		this.startExerciseSubscription = this.trainingService.startExerciseSubject.subscribe({
+		  next: (ex:ExerciseModel) => {
+			this.startedExercise = ex;
+			if(ex){
+			  this.ongoingTraining = true;
+			}
+			else{
+			  this.ongoingTraining = false;
+			}
+		  },
+		  error: (e) => {},
+		  complete: () => {}
+		});
+		
+Past Trainings Component 
+	Use the new subscription syntex 
+		this.pastExerciesSubscription = this.trainingService.pastExercisesSubject.subscribe({
+		  next: (pastExercises: ExerciseModel[]) => {
+			this.dataSource.data = pastExercises;
+		  },
+		  error: (e) => {},
+		  complete: () => {}
+		});
+
+New Training Component 
+	Use the new subscription syntex
+		this.exercisesFetchedSubscription = this.trainingService.exercisesFetchedSubject.subscribe({
+		  next: (exercises: ExerciseModel[]) => {
+			console.log("New trainings fetched", exercises);
+			this.exercises = exercises;
+		  },
+		  error: (e) => {},
+		  complete: () => {}
+		});
+		
+Current Training Component 
+	Use the new subscription syntex
+		dialogRef.afterClosed().subscribe({
+		  next: (result:boolean) => {
+			if(result){
+			  this.trainingService.cancelExercise(this.progress);
+			  return;  
+			}
+			//No continue
+			this.cycleThroughPhrases();
+			this.initProgress();
+		  },
+		  error: (e) => {},
+		  complete: () => {}
+		});

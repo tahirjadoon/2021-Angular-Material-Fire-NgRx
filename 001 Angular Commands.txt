@@ -45,3 +45,9 @@ Link
         });
 	a tag 
 		<a routerLink="/training">Training</a>
+		
+Navigating from inside component 
+	this.router.navigate(['/training']);
+	
+Setting up Token with authentication
+	
