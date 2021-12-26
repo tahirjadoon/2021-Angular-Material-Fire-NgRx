@@ -1,0 +1,90 @@
+Open "prj018FitnessTracker-Optimizations-FeatureAndShared-Modules" in file explorer and delete node_modules
+
+Copy "prj018FitnessTracker-Optimizations-FeatureAndShared-Modules" and rename as "prj019FitnessTracker-Optimizations-SplittingRoutes-LazyloadingModules"
+
+Open "prj019FitnessTracker-Optimizations-SplittingRoutes-LazyloadingModules" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+Splitting Routes 
+	
+	When splitting routes the RouterModule.forRoot is only called once and it is in app-routing.module.ts 
+	
+	auth-routing.module.ts 
+		Under Modules/Feature create a new module called auth-routing.module.ts 
+		We'll move the login and signup routes to this file from app-routing.module.ts 
+		
+			const routes: Routes = [
+				{path: 'signup', component: SignupComponent},
+				{path: 'login', component: LoginComponent}
+			  ];
+
+			@NgModule({
+			  imports: [RouterModule.forChild(routes)], 
+			  exports: [RouterModule]
+			})
+			
+		and then add it to the imports array of the AuthModule in auth.module.ts 
+			imports: [SiteSharedModule, AuthRoutingModule],
+			
+		the routs should be available globally
+		
+		app-routing.module 
+			Remove the login, signup routes 
+		
+	training-routing.module.ts 
+		These will be loaded lazily and will only load when needed 
+		
+		From app-routing.module.ts move 
+			const routes: Routes = [
+				{path: 'training', component: TrainingComponent, canActivate: [AuthGuard]}
+			];
+		to trainging-routing.module.ts with following changes 
+			@NgModule({
+			  imports: [RouterModule.forChild(routes)], 
+			  exports: [RouterModule]
+			})
+		
+		and then add it to the imports array of the TrainingModule in training.module.ts 
+			imports: [SiteSharedModule, TrainingRoutingModule],
+		
+		app-routing.module 
+			Remove the training route
+			
+Lazy loadng Training section
+	app.module.ts 
+		Remove the TrainingModule from the imports array 
+		
+	app-routing.module.ts 
+		go to the app routing module and register a second route 
+			{ path: 'training', loadChildren: () => import('./Modules/Feature/training.module')
+								  .then(m => m.TrainingModule)  }
+								  
+	Then go back to the training-routing.module and remove the 'training' from the route and make it empty.
+		const routes: Routes = [
+			{path: '', component: TrainingComponent, canActivate: [AuthGuard]}
+		];	
+		
+	Next, remove the AuthGurad from training-routing.module.ts to app-routing.module.ts. should not download this section due to lazy loading if the user is not logged in.
+		const routes: Routes = [
+			{path: '', component: TrainingComponent}
+		];
+		
+	AuthGuard 
+		Next go to the auth guard and implement CanLoad which is needed for the lazy laodng. Check the authguard for more details 
+		
+	and then in app-routing.module change the new training path to 
+		{ path: 'training', loadChildren: () => import('./Modules/Feature/training.module')
+                                          .then(m => m.TrainingModule), 
+                                          canLoad: [AuthGuard],
+                                          canActivate: [AuthGuard]  }
+										  
+
+		
+		
+		

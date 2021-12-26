@@ -1,0 +1,27 @@
+
+<!--mat-sidenav-container acts as a structural container for our content and sidenav-->
+<mat-sidenav-container>
+    <!--mat-sidenav represents the added side content-->
+    <mat-sidenav role="navigation" #sidenav> <!--opened="true" keeps it open-->
+        <!--child component-->
+        <app-sidenav-list (sideNavListClose)="sidenav.close()"></app-sidenav-list>
+    </mat-sidenav>
+
+    <!--mat-sidenav-conten represents the main content-->
+    <mat-sidenav-content>
+        <!--child compotent-->
+        <app-header (hdrSideNavToggle)="sidenav.toggle()"></app-header>
+
+        <div *ngIf="warningText !== ''" fxLayout fxLayoutAlign="center" class="firebase-warning" [innerHtml]="warningText">
+        </div>
+        
+        <!-- main content-->
+        <main>
+            <!--moved the router-outlet inside mat-sidenav-content -->
+            <router-outlet></router-outlet>
+        </main>
+    </mat-sidenav-content>
+
+</mat-sidenav-container>
+
+
