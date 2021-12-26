@@ -1,0 +1,20 @@
+<section>
+    <form [formGroup]="loginForm" fxLayout="column" fxLayoutAlign="center center" fxLayoutGap="10px" (ngSubmit)="onFormSubmit()">
+        <h1>Login</h1>
+        <mat-form-field>
+            <input type="email" formControlName="email" matInput placeholder="Your email">
+            <mat-hint>Please enter a valid hint</mat-hint>
+            <mat-error *ngIf="loginFormControl.email.invalid && (loginFormControl.email.pristine || loginFormControl.email.dirty || loginFormControl.email.touched) && loginFormControl.email.errors?.required">Email is required</mat-error>
+            <mat-error *ngIf="loginFormControl.email.invalid && (loginFormControl.email.pristine || loginFormControl.email.dirty || loginFormControl.email.touched) && !loginFormControl.email.errors?.required && loginFormControl.email.errors?.email">Invalid email</mat-error>
+        </mat-form-field>
+
+        <mat-form-field>
+            <input type="password" formControlName="password" matInput placeholder="Your password">
+            <mat-hint>Please enter your password</mat-hint>
+            <mat-error *ngIf="loginFormControl.password.invalid && (loginFormControl.password.pristine || loginFormControl.password.dirty || loginFormControl.password.touched) && loginFormControl.password.errors?.required">Password is required</mat-error>
+        </mat-form-field>
+
+        <button *ngIf="!isLoading" type="submit" mat-raised-button color="primary" [disabled]="loginForm.invalid">Submit</button>
+        <mat-spinner *ngIf="isLoading"></mat-spinner>
+    </form>
+</section>

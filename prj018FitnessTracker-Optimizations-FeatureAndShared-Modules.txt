@@ -1,0 +1,75 @@
+Open "prj017FitnessTracker-Spinner-SnackBar-ErrorHandling-SharedService" in file explorer and delete node_modules
+
+Copy "prj017FitnessTracker-Spinner-SnackBar-ErrorHandling-SharedService" and rename as "prj018FitnessTracker-Optimizations-FeatureAndShared-Modules"
+
+Open "prj018FitnessTracker-Optimizations-FeatureAndShared-Modules" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Feature Modules 
+	We'll be creating feature modules.
+	We already have one such modlue /Modules/material.module.ts 
+	
+	In the Modules create a new folder "Feature" and move the material.module.ts in it
+	
+	Shared Module 
+		In the Modules create a new shared module which will have common stuff between all the modules
+		
+		Create a new folder "Shared" inside Modules folder 
+		
+		>ng g m /Modules/Shared/site-shared 
+		
+		and then specify both import and export for it  
+		
+		imports: [CommonModule, FormsModule, ReactiveFormsModule, FlexLayoutModule, MaterialModule, NgFireModule],
+		exports: [CommonModule, FormsModule, ReactiveFormsModule, FlexLayoutModule, MaterialModule, NgFireModule]
+		
+	NgFireModule
+		>ng g m /Modules/Feature/ng-fire
+		
+		imports: [CommonModule,  AngularFirestoreModule, AngularFireAuthModule],
+		exports: [AngularFirestoreModule, AngularFireAuthModule]
+			
+	
+	AuthModule
+		>ng g m /Modules/Feature/auth 
+		
+		From app.module.ts declaration move the following two to auth.module.ts 
+			declarations: [SignupComponent,LoginComponent],
+			Also move the "import from" as well
+			
+		Then update the imports and exports array. 
+			imports: [SiteSharedModule],
+			exports: [SiteSharedModule]
+			
+		Add AuthModule to the imports array of app.modue.ts
+	
+	Training Module 
+		>ng g m /Modules/Feature/training
+		
+		From app.module.ts declaration move the following two to training.module.ts 
+			TrainingComponent, CurrentTrainingComponent, NewTrainingComponent, PastTrainingsComponent, StoptrainingDialogueComponent
+			Also move the "import from" as well
+			
+		Then update the imports and exports array. 
+			imports: [SiteSharedModule],
+			exports: [SiteSharedModule]
+			
+		Also move the entryComponents array to training module 
+			StoptrainingDialogueComponent
+		Add TrainingModule to the imports array of app.modue.ts
+	
+App Module 
+	Make sure to add the above feature modules to the import array of the app module
+	
+	Remove from imports array following since these have been moved to the above featured module 
+		FormsModule,
+		ReactiveFormsModule,
+		and any thing that is been moved to the site shared module 
+		
