@@ -1,0 +1,149 @@
+Open "prj016FitnessTracker-fireBase-AngularFire-Auth-Signup" in file explorer and delete node_modules
+
+Copy "prj016FitnessTracker-fireBase-AngularFire-Auth-Signup" and rename as "prj017FitnessTracker-Spinner-SnackBar-ErrorHandling-SharedService"
+
+Open "prj017FitnessTracker-Spinner-SnackBar-ErrorHandling-SharedService" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Must read "003 Setting Up FireBase.txt" to setup before doing below
+* FireBase
+* AngularFire
+
+Project related information is in environment.ts and environment.prod.ts file, check "003 Setting Up FireBase.txt" for more details. 
+Update following in your environment file
+
+firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>',
+    appId: '<your-app-id>',
+    measurementId: '<your-measurement-id>'
+  }
+
+------------------------------------------------------------------------------
+
+Open header.component.html and change LOGO to NG Fitness
+
+Adding snackbar 
+	Import it to material.modules.ts 
+		import {MatSnackBarModule} from '@angular/material/snack-bar'; 
+	and then add it to the importand and exports array 
+		MatSnackBarModule
+	
+Error handling and displaying errors with snack bar
+	Auth Service	
+		Inject MatSnackBar
+			private matSnackBar: MatSnackBar
+			
+		Then go to registerUser and change the catch block
+			 //closing the snack bar after 3 secnds. not using a button so passing null for the second argument
+			 this.matSnackBar.open(error.message, null, {duration: 5000});
+			 
+		Then go to login method and change the catch block 
+			//closing the snack bar after 5 secnds. not using a button so passing null for the second argument
+			var msg = error.message;
+			if(error.message.includes("auth/wrong-password"))
+			  msg = "Eiter email or password is wrong.";
+			else if(error.message.includes("auth/user-not-found"))
+			  msg = "Login not found with the specified email.";
+			this.matSnackBar.open(msg, null, {duration: 5000});
+					
+Showing spiner when loggin in, signing up and new training
+	ui.service.ts 
+		Create a new service which will control global ui. It ill get created with name ui.service.ts 
+			ng g s /Services/ui 
+		
+		It will have a subject which will emit a true or false 
+			loadingStateChanged: Subject<boolean> = new Subject<boolean>();
+			
+			loadingStateHandle(state:boolean){
+				this.loadingStateChanged.next(state);
+			  }
+	Auth service 
+		inject the ui service 
+			 private uiService: UiService
+			 
+		Change the login method 
+			login(authData: AuthDataModel){
+				this.uiService.loadingStateHandle(true);
+				this.fireAuth.signInWithEmailAndPassword(authData.email, authData.password)
+							  .then(result => {
+								this.uiService.loadingStateHandle(true);
+							  })
+							  .catch(error => {
+								this.uiService.loadingStateHandle(true);
+								//closing the snack bar after 5 secnds. not using a button so passing null for the second argument
+								var msg = error.message;
+								if(error.message.includes("auth/wrong-password"))
+								  msg = "Either email or password is wrong.";
+								else if(error.message.includes("auth/user-not-found"))
+								  msg = "Login not found with the specified email.";
+								this.matSnackBar.open(msg, null, {duration: 5000});
+							  });
+			  }
+		
+		Change the register service 	
+			registerUser(authData: AuthDataModel){
+				this.uiService.loadingStateHandle(true);
+				//returns a promise
+				this.fireAuth.createUserWithEmailAndPassword(authData.email, authData.password)
+							.then(result => {
+							  this.uiService.loadingStateHandle(false);
+							  //redirect to login
+							  this.router.navigate(['/login']);
+							})
+							.catch(error => {
+								this.uiService.loadingStateHandle(false);
+								//closing the snack bar after 5 secnds. not using a button so passing null for the second argument
+								this.matSnackBar.open(error.message, null, {duration: 5000});
+							});
+				
+			  }
+
+	Goto login.component.ts 
+		Inject the service, subscribe to it and then change the state iof a variable "isLoading"
+		Make sure to unsubscribe as well
+		
+	Go to login.component.html ans place the mat-spinner towards the bottom 
+		Inject the 
+			<mat-spinner></mat-spinner>
+			
+		and then either show mat-spinner or submit button depending upon the state of the  isLoading
+		
+	Signup 
+		Just like login, do the same in the signup component html and ts files 
+
+	New Training
+		Go to training service and injetc ui service 
+		Then go to method getAvailableExercises and emit loadingStateHandle
+		Finally go to the new training compoent and html and display and hide spinner using the examples above
+		
+We have implemented the error handling via snack bar at local level. We have now ui service so we can use that
+	UI Serivce 
+		inject mat snack bar
+			private snackBar: MatSnackBar
+		and a new method to display snack bar 
+			  ///show snack bar 
+			  ///<parm name="message">message</parm>
+			  ///<parm name="action">action buttons</parm>
+			  ///<parm name="duration">duration in seconds</parm>
+			  showSnackBar(message:string, action:any, durationInSeconds: number){
+				this.matSnackBar.open(message, action, {
+				  duration: 1000*durationInSeconds
+				});
+			  }
+	Auth service 
+		now use the UI Service to display the snack bar in logn and signup methods
+		
+Also in the training service do error handling with matsnackbar for getAvailableExercises, getPastExercises
+	
