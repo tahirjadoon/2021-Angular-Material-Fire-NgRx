@@ -14,3 +14,12 @@ FireBase:
 	For setup see: "003 Setting Up FireBase.txt"
 	
 	For setting up the FireBase info at the project level see: "prj012FitnessTracker-firebase-config-json.txt"
+	
+	
+Different angular material components covered
+	MatButtonModule, MatCheckboxModule, MatIconModule, 
+    MatFormFieldModule, MatInputModule, MatDatepickerModule, MatNativeDateModule, 
+    MatSidenavModule, MatToolbarModule, MatListModule, 
+    MatTabsModule, MatCardModule, MatSelectModule, MatProgressSpinnerModule,
+    MatDialogModule, MatTableModule, MatSortModule, MatPaginatorModule, 
+    MatSnackBarModule
