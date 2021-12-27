@@ -112,19 +112,24 @@ Route 2:
 			FlexLayoutModule
 		  ]
 		
-Also add FormsModule to src \ app \ app.module.ts
-	import { FormsModule } from '@angular/forms';
-	imports: [
-		BrowserModule,
-		AppRoutingModule,
-		BrowserAnimationsModule,
-		MaterialModule,
-		FlexLayoutModule, 
-		FormsModule
-	  ]
+	Also add FormsModule to src \ app \ app.module.ts
+		import { FormsModule } from '@angular/forms';
+		imports: [
+			BrowserModule,
+			AppRoutingModule,
+			BrowserAnimationsModule,
+			MaterialModule,
+			FlexLayoutModule, 
+			FormsModule
+		  ]
 	
 >ng serve
 	run the app to make sure that nothing is broken. 
+	
+	
+>npm install --save @ngrx/store 
+	NgRx for state managementt 
+	Setup with prj020.. so check for details 
 ------------------------------------------------------------------
 
 Lets try some buttons to make sure all is working 
