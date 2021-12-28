@@ -1,0 +1,233 @@
+This example just shows the NgRx technique. This implementation will not be carried forward. prj21 will build from prj19 and will be a multiple reducer approach.
+
+Open "prj019FitnessTracker-Optimizations-SplittingRoutes-LazyloadingModules" in file explorer and delete node_modules
+
+Copy "prj019FitnessTracker-Optimizations-SplittingRoutes-LazyloadingModules" and rename as "prj020FitnessTracker-NgRx-StateManagement-Single-LoadingSpinner"
+
+Open "prj020FitnessTracker-NgRx-StateManagement-Single-LoadingSpinner" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Must read "003 Setting Up FireBase.txt" to setup before doing below
+* FireBase
+* AngularFire
+
+Project related information is in environment.ts and environment.prod.ts file, check "003 Setting Up FireBase.txt" for more details. 
+Update following in your environment file
+
+firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>',
+    appId: '<your-app-id>',
+    measurementId: '<your-measurement-id>'
+  }
+
+------------------------------------------------------------------------------
+https://chiragrupani.medium.com/simple-angular-app-using-ngrx-8-store-and-effects-factory-methods-f3423b9f6d3b
+https://indepth.dev/posts/1042/how-to-start-flying-with-angular-and-ngrx
+
+
+What is difference between NgRx and RxJS?
+If you want to take advantage of single direction data flow using Store in Angular NgRx is the solution. 
+Using NgRx store you can create your store, effects , reducers & actions in any angular app.
+
+Redux
+	Centeral store for reloding or we have loaded any exercises etc
+	
+	The Reducer is based on three core redux principles:
+		* Single source of truth — state of entire application is stored in single store
+		* State is read-only — state can only be updated by dispatching Actions
+		* Changes are made with pure functions — Reducers never mutates previous state, it always returns the state based on current state and action
+	
+	Actions
+		When creating action these should be verbose like 
+			export const GetToDoAction = createAction('[ToDo] - Get ToDo');
+			export const CreateToDoAction = createAction('[ToDo] - Create ToDo', props<ToDo>());
+			export const BeginGetToDoAction = createAction('[ToDo] - Begin Get ToDo');
+			
+	
+Install NgRx
+	>npm install @ngrx/store --save
+	>npm install @ngrx/effects --save
+	
+	
+Create a new folder called "ngRx-Store"
+
+NgRxConstants
+	Create a constant class so that we do not work with strings. Check the file for details. 
+
+Can be done two way, Simple and littleAdance
+	Simple 
+		
+			
+		Handling loading and stop loading spinner with the state 
+			In the ngrxConstants class add 
+				export class NgRxConstants{
+					public static SPINNER_START_LOADING = '[ShowSpinner] START_LOADING';
+					public static SPINNER_STOP_LOADING = '[HideSpinner] STOP_LOADING';
+				}
+		
+		app.loading-state.reducer.ts
+			and in the appReducer to handle above 
+				Create an nterface for "State" loading/no loading 
+					export interface LoadingState {
+						isLoading: boolean;
+					}
+					
+				Create a default initial state 
+					const initialState: LoadingState = {
+						isLoading: false //first implementation was in ui.service.ts
+					};
+					
+				and then the appReducer function will look like 
+					export function loadingSpinnerReducerSimple(state = initialState, action){
+						switch(action.type){
+							case NgRxConstants.SPINNER_START_LOADING:
+								const startState: LoadingState = { isLoading: true };
+								return startState;
+							case NgRxConstants.SPINNER_STOP_LOADING:
+								const stopState: LoadingState = { isLoading: false };
+								return stopState;
+							default:
+								return state;
+						}
+					}
+					
+			Make the appReducer available to the app		
+				Go to app.module.ts 
+					import { StoreModule } from '@ngrx/store'; 
+					
+					and then add to the imports 
+						StoreModule.forRoot({ui: loadingSpinnerReducerSimple})
+			
+			Dispatcher 
+				Go to AuthService
+					import every thing from the add.reducer.ts so that the interface etc are available to us. also import the constants 
+						import { Store } from '@ngrx/store';
+						import * as loadingSpinnerStore from '../ngRx-Store/app.loading-state.reducer';
+						import { NgRxConstants } from "../ngRx-Store/ng-rx.constants";
+						
+					Then inject the ngex store. Keep in mind the the delaration in app.module.ts 
+						private ngRxStore: Store<{ui: loadingSpinnerStore.LoadingState}>
+							must provide the type 
+							
+					registerUser method  do the changes 
+						1. 
+							comment/remove
+								this.uiService.loadingStateHandle(true);
+							with 
+								this.ngRxStore.dispatch({ type: NgRxConstants.SPINNER_START_LOADING });
+						2.  two places 
+							comment remove 
+								this.uiService.loadingStateHandle(false);
+							with 
+								this.ngRxStore.dispatch({type: NgRxConstants.SPINNER_STOP_LOADING});
+						
+					login method do the same as registerUSer 
+			
+			Subscribe 	
+				We'll subscribe in the login and signup component 
+				
+				For both the components first import 
+					import { Store } from '@ngrx/store';
+					import * as loadingSpinnerStore from '../../../ngRx-Store/app.loading-state.reducer';
+					import { NgRxConstants } from "../../../ngRx-Store/ng-rx.constants";
+				
+				Then inject the store 
+					private ngRxStore: Store<{ui: loadingSpinnerStore.LoadingState}>
+					
+				Then where we have current loading state subscription 
+					var 
+						isLoading2$: Observable<boolean>;
+						
+					Comment out the loadingStateSubscription and then do 
+					this.isLoading2$ = this.ngRxStore.pipe(
+					  map(x => x.ui.isLoading)
+					);
+					
+				and in the html change to beolow. take note of (isLoading2$ | async) since at first the button will not display at all
+					<button *ngIf="!(isLoading2$ | async)" type="submit" mat-raised-button color="primary" [disabled]="loginForm.invalid">Submit</button>
+					<mat-spinner *ngIf="isLoading2$ | async"></mat-spinner>
+			
+			Every thing should work as is 
+			
+	Little Advance example
+		ngrxConstants will stay the same 
+		
+		app.loading-state.reducer.ts
+			
+			1. State interface
+			export interface LoadingState {
+				isLoading: boolean;
+			}
+
+			2. initial state is of type State
+			export const initialState: LoadingState = {
+				isLoading: false //first implementation was in ui.service.ts
+			};
+
+			3. actions are messages that are dispatched
+			export const SpinnerShowAction = createAction(NgRxConstants.SPINNER_START_LOADING);
+			export const SpinnerHideAction = createAction(NgRxConstants.SPINNER_STOP_LOADING);
+
+			4. Reducer 
+			const reducer = createReducer(
+				initialState, 
+				on(SpinnerShowAction, state => {
+					return {isLoading: true};
+				}),
+				on(SpinnerHideAction, state => {
+					return {isLoading: false};
+				})
+			);
+
+			5. export spinner loading reducer
+			/**
+			 * 
+			 * @param state : of type LoadingState interface
+			 * @param action : action performed per actions specified 
+			 * @returns new loadingState of type LoadingState interface
+			 */
+			export function loadingReducer(state: LoadingState = initialState, action: Action){
+				return reducer(state, action);
+			}
+	
+		
+		make it available in app module 
+			StoreModule.forRoot({uiLoading: loadingReducer})
+			
+		Dispatcher 
+			you call the actions 
+			
+				this.ngRxStore.dispatch(loadingSpinnerStore.SpinnerHideAction()); 
+				or 
+				this.ngRxStore.dispatch(loadingSpinnerStore.SpinnerHideAction());
+				
+		and in login.component.ts 
+			import * as loadingSpinnerStore from '../../../ngRx-Store/app.loading-state.reducer';
+			variable 
+				isLoading$: Observable<loadingSpinnerStore.LoadingState>;
+			inject 
+				private store2: Store<{ui: loadingSpinnerStore.LoadingState}>
+			constructor 
+				this.isLoading$ = this.store2.pipe(select('ui'));			
+			ngOnInit
+				this.loadingStateSubscription = this.isLoading$.pipe(
+				  map(x => {
+					this.isLoading = x.isLoading;
+				  })
+				).subscribe();
+			
+	
+	
+	
