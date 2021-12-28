@@ -1,0 +1,191 @@
+Open "prj019FitnessTracker-Optimizations-SplittingRoutes-LazyloadingModules" in file explorer and delete node_modules
+
+Copy "prj019FitnessTracker-Optimizations-SplittingRoutes-LazyloadingModules" and rename as "prj021FitnessTracker-NgRx-StateManagement-Multi-LoadingSpinner-login-Signup-Training"
+
+Open "prj021FitnessTracker-NgRx-StateManagement-Multi-LoadingSpinner-login-Signup-Training" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Must read "003 Setting Up FireBase.txt" to setup before doing below
+* FireBase
+* AngularFire
+
+Project related information is in environment.ts and environment.prod.ts file, check "003 Setting Up FireBase.txt" for more details. 
+Update following in your environment file
+
+firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>',
+    appId: '<your-app-id>',
+    measurementId: '<your-measurement-id>'
+  }
+
+------------------------------------------------------------------------------
+https://chiragrupani.medium.com/simple-angular-app-using-ngrx-8-store-and-effects-factory-methods-f3423b9f6d3b
+https://indepth.dev/posts/1042/how-to-start-flying-with-angular-and-ngrx
+
+Install NgRx
+	>npm install @ngrx/store --save
+	>npm install @ngrx/effects --save
+	
+
+Multi Reducer approach
+
+Create a folder "ngRx-Store", all ngrx related functionality will go in this folder. 
+	
+	ui.actions.ts [a ui specific actions]
+		First implement ui.actions and then ui.reducer.ts
+		
+		imports at the top
+			import { Action } from "@ngrx/store";
+
+		create constants for the loading flag. These will be used by the actions
+		the convention is that in the string part, inside [] put the reducer name
+			export class UI_LOADING_FLAG {
+				public static START_LOADING = '[UI] Start Loading';
+				public static STOP_LOADING = '[UI] Stop Loading';
+			};
+
+		export action creator or classes so that we get auto completion support
+			export class UiStartLoadingAction implements Action {
+				readonly type = UI_LOADING_FLAG.START_LOADING;
+			};
+			export class UiStopLoadingAction implements Action {
+				readonly type = UI_LOADING_FLAG.STOP_LOADING;
+			};
+
+		export a custom type to be used by the uiReducer in ui.reducer.ts file
+			export type UiActions = UiStartLoadingAction | UiStopLoadingAction; 
+			
+	ui.reducer.ts [a ui specific reducer]
+		ui specific reducer 
+		First implement ui.actions and then ui.reducer.ts
+		
+		Imports at the top 
+			import { UiActions, UI_LOADING_FLAG } from "./ui.actions";
+
+		create an interface to flag loading state 
+		this is the interface which will get hooked into
+			export interface UiLoadingStateFlag {
+				isLoading: boolean;
+			};
+
+		create initial loading flag state 
+			const uiInitialLoadingStateFlag: UiLoadingStateFlag = {
+				isLoading: false
+			};
+
+		create a rducer function for the UI
+		action is of type UiActions (custom type) which is in ui.actions.ts
+			export function uiReducer(state = uiInitialLoadingStateFlag, action: UiActions){
+				switch (action.type){
+					case UI_LOADING_FLAG.START_LOADING:
+						return { isLoading: true }; //show spinner
+					case UI_LOADING_FLAG.STOP_LOADING:
+						return { isLoading: false }; //hide spinner
+					default: 
+						return state; //default
+				}
+			}
+
+		implement a helper constant which will give us the loading flag from the state that is passed to it. 
+		it is an arrow function 
+			export const getIsUiLoadingFlag = (loadingState: UiLoadingStateFlag) => loadingState.isLoading;
+		
+		
+	app.reducer.ts [master reducer app level]
+		this is the app wide reducer which groups together other reducers
+		
+		import the UIReducer 
+			import { ActionReducerMap, createFeatureSelector, createSelector } from '@ngrx/store';
+			import * as fromUiReducer from './ui.reducer';
+
+		define application wide state 
+			export interface AppState {
+				ui: fromUiReducer.UiLoadingStateFlag
+			};
+
+		group all the reducers 
+			export const reducers: ActionReducerMap<AppState> = {
+				//use the reducer from the ui.reducer.ts
+				ui: fromUiReducer.uiReducer
+			};
+
+		create utility function to create a feature selector. selectors are helpful functions that make it easy to pull information from our state 
+		createFeatureSelector is generic function where thr type will be our interface LoadingStateFlag and then will pull the 'ui' slice of the store
+		it will allow us to get quick access to AppState.ui which is being returned by reducer.ui above
+			export const getUiState = createFeatureSelector<fromUiReducer.UiLoadingStateFlag>('ui');
+
+		create utility function which gives us uiIsLoadingFlag state by creating a selector.  
+		pass to it the getUiState (above) reference and ui reducers getIsUiLoadingFlag reference.
+		from the state we'll get the loding property value 
+		this is usefull in accessing it in components
+			export const getIsUiLoadingFlag = createSelector(getUiState, fromUiReducer.getIsUiLoadingFlag);
+			
+Dispatcher 
+	Targeting Auth Service ==> auth.service.ts 
+	
+	Imports 
+		import * as fromAppReducer from '../ngRx-Store/app.reducer';
+		import * as fromUiActions from '../ngRx-Store/ui.actions';
+		import { Store } from '@ngrx/store';
+	
+	Inject 
+		private ngStore: Store<fromAppReducer.AppState>
+	
+	registerUser and login methods 
+		comment the ui service base state handle and in it place use the ngrx store 
+		3 places each in both the methods 
+		
+		for displaying spinner 
+			this.ngStore.dispatch(new fromUiActions.UiStartLoadingAction());
+		for hidding spinner 
+			this.ngStore.dispatch(new fromUiActions.UiStopLoadingAction());
+			
+Subscription
+	Go to the login and sign up components 
+		imports 
+			import * as fromAppReducer from '../../../ngRx-Store/app.reducer';
+			import { Store } from '@ngrx/store';
+		
+		Create a new variable 
+			isLoading$: Observable<boolean>; 
+			
+		inject 
+			 private ngStore: Store<fromAppReducer.AppState> 
+			 
+		in ngOnInt 
+			comment the current ui service subscription, do comment the unsubscribe in the ngOnDestroy a well 
+			
+			and use line 
+				this.isLoading$ = this.ngStore.select(fromAppReducer.getIsUiLoadingFlag);
+		
+		since the variable is an observable, will need to change the html for both logn and signup to use async pipe
+		
+		login html 
+			<button *ngIf="!(isLoading$ | async)" type="submit" mat-raised-button color="primary" [disabled]="loginForm.invalid">Submit</button>
+			<mat-spinner *ngIf="isLoading | async"></mat-spinner>
+		
+		signup html 
+			<button *ngIf="!(isLoading$ | async)" type="submit" mat-raised-button color="primary" [disabled]="f.invalid">Submit</button>
+			<mat-spinner *ngIf="isLoading$ | async"></mat-spinner>
+ 
+Just like what we did for the auth, do the same for the training. 
+	Places to change 
+	TrainingService including the method getAvailableExercises
+	New Training component ts and html files 
+		
+		
+	
+	
+	
