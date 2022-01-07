@@ -1,0 +1,146 @@
+Open "prj021FitnessTracker-NgRx-StateManagement-Multi-LoadingSpinner-login-Signup-Training" in file explorer and delete node_modules
+
+Copy "prj021FitnessTracker-NgRx-StateManagement-Multi-LoadingSpinner-login-Signup-Training" and rename as "prj022FitnessTracker-NgRx-StateManagement-Auth-Handling"
+
+Open "prj022FitnessTracker-NgRx-StateManagement-Auth-Handling" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Must read "003 Setting Up FireBase.txt" to setup before doing below
+* FireBase
+* AngularFire
+
+Project related information is in environment.ts and environment.prod.ts file, check "003 Setting Up FireBase.txt" for more details. 
+Update following in your environment file
+
+firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>',
+    appId: '<your-app-id>',
+    measurementId: '<your-measurement-id>'
+  }
+
+------------------------------------------------------------------------------
+https://chiragrupani.medium.com/simple-angular-app-using-ngrx-8-store-and-effects-factory-methods-f3423b9f6d3b
+https://indepth.dev/posts/1042/how-to-start-flying-with-angular-and-ngrx
+
+Must be familar with 
+prj021FitnessTracker-NgRx-StateManagement-Multi-LoadingSpinner-login-Signup-Training 
+
+---------------------------------------------------------------------------------
+
+In this step the auth service will be changed to use NgRx 
+
+In ngRx-Store folder create two ts files namely "auth.reducer.ts" and auth.action.ts". These will follow the similar pattern as ui reducer and action done in previous project. 
+
+auth.actions.ts and auth.reducer.ts will follow the same style as ui.actions.ts and ui.reducer.ts. Check both the files for more details. 
+
+Then go to the app.reducer.ts and add to it
+	First do the import at the top 
+		import * as fromAuthReducer from './auth.reducer';
+	Then add "auth" to the AppState
+		export interface AppState {
+			ui: fromUiReducer.UiLoadingStateFlag; 
+			auth: fromAuthReducer.AuthStateFlag;
+		};
+	also add auth to the ActionReducerMap
+		export const reducers: ActionReducerMap<AppState> = {
+			//use the reducer from the ui.reducer.ts, auth.reducer.ts
+			ui: fromUiReducer.uiReducer,
+			auth: fromAuthReducer.authReducer
+		};
+		
+	and finally create the two utility functions 
+		export const getAuthState = createFeatureSelector<fromAuthReducer.AuthStateFlag>('auth');
+		export const getIsAuthenticatedFlag = createSelector(getAuthState, fromAuthReducer.getIsAuthFlag);
+
+auth.service.ts 
+	First do an import for auth actions 
+		import * as fromAuthAction from '../ngRx-Store/auth.actions';
+		
+	we are using ngrx to dispatch the status so dont need it any more
+		//private isUserAuthenticated: boolean = false;
+		
+	we are using ngrx to dispatch the status so dont need it any more
+		//hasUserLoggedInSubject : Subject<boolean> = new Subject<boolean>();
+  
+	we are using ngrs so dont need it
+	  /*
+	  get isAuthenticated(): boolean {
+		return this.isUserAuthenticated;
+	  }
+	  */
+  
+	method initAuthListener takes two routes authSuccessful or logoutFull. It is here that we need to dispatch now. 
+		authSuccessful
+			we are using ngrx so use dispatch
+			//this.isUserAuthenticated = true;
+			//let the app know that auth is successful
+			//this.hasUserLoggedInSubject.next(true);
+			this.ngStore.dispatch(new fromAuthAction.SetAuthenticated());
+		logoutFull
+			we are using ngrx so use dispatch
+			//this.isUserAuthenticated = false;
+			//let the app know that auth is successful
+			//this.hasUserLoggedInSubject.next(false);
+			this.ngStore.dispatch(new fromAuthAction.SetUnAuthenticated());
+			
+For the subscriptions
+	auth.guard.ts 
+		do the import 
+			import { Store } from '@ngrx/store';
+			import * as fromAppReducer from '../ngRx-Store/app.reducer';
+			
+		dont need the auth service inside the constructor. Here is new 
+			constructor(private ngrxStore: Store<fromAppReducer.AppState>, private router: Router){}
+		
+		Also change the canActivate and canLoad methods. Take note of pipe and  take(1). Observable continously emits values so need this. Guard only runs once 
+			
+		canActivate(
+			route: ActivatedRouteSnapshot,
+			state: RouterStateSnapshot): Observable<boolean | UrlTree> | Promise<boolean | UrlTree> | boolean | UrlTree {      
+			  return this.ngrxStore.select(fromAppReducer.getIsAuthenticatedFlag).pipe(
+				take(1)
+			  );
+		  }
+
+		  canLoad(route: Route, segments: UrlSegment[]): boolean | UrlTree | Observable<boolean | UrlTree> | Promise<boolean | UrlTree> {
+			return this.ngrxStore.select(fromAppReducer.getIsAuthenticatedFlag).pipe(
+			  take(1)
+			);
+		  }
+		
+	header.component.ts 
+		do the same for the header component, checked the commented and new code in there. important pieces are 
+			using ngrx so chnage to observable<boolean>
+			//isUserAuthenticated: boolean = false;
+			isUserAuthenticated$: Observable<boolean>;
+			
+			we are using ngrx now
+			/*
+			this.authSubscription = this.authService.hasUserLoggedInSubject.subscribe(isAuthenticated => {
+			  this.isUserAuthenticated = isAuthenticated;
+			});
+			*/
+			this.isUserAuthenticated$ = this.ngrxStore.select(fromAppReducer.getIsAuthenticatedFlag);
+			
+	header.component.html
+		where ever isUserAuthenticated is being used, use async pipie with it
+			isUserAuthenticated$ | async
+			!(isUserAuthenticated$ | async)
+			
+	sidenav-list.component.ts and sidenav-list.component.html 
+		follow the same as header above
+		
+	login.component.ts and signup.component.ts
+		redirection to the training in case user is logged in
