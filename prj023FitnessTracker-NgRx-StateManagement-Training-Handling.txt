@@ -1,0 +1,269 @@
+Open "prj022FitnessTracker-NgRx-StateManagement-Auth-Handling" in file explorer and delete node_modules
+
+Copy "prj022FitnessTracker-NgRx-StateManagement-Auth-Handling" and rename as "prj023FitnessTracker-NgRx-StateManagement-Training-Handling"
+
+Open "prj023FitnessTracker-NgRx-StateManagement-Training-Handling" in vs code 
+
+Run 
+
+>npm install 
+>ng serve
+
+CTRL+C to break
+------------------------------------------------------------------------------
+
+Must read "003 Setting Up FireBase.txt" to setup before doing below
+* FireBase
+* AngularFire
+
+Project related information is in environment.ts and environment.prod.ts file, check "003 Setting Up FireBase.txt" for more details. 
+Update following in your environment file
+
+firebase: {
+    apiKey: '<your-key>',
+    authDomain: '<your-project-authdomain>',
+    databaseURL: '<your-database-URL>',
+    projectId: '<your-project-id>',
+    storageBucket: '<your-storage-bucket>',
+    messagingSenderId: '<your-messaging-sender-id>',
+    appId: '<your-app-id>',
+    measurementId: '<your-measurement-id>'
+  }
+
+------------------------------------------------------------------------------
+https://chiragrupani.medium.com/simple-angular-app-using-ngrx-8-store-and-effects-factory-methods-f3423b9f6d3b
+https://indepth.dev/posts/1042/how-to-start-flying-with-angular-and-ngrx
+
+Must be familar with 
+prj021FitnessTracker-NgRx-StateManagement-Multi-LoadingSpinner-login-Signup-Training 
+
+---------------------------------------------------------------------------------
+
+A hint ==> training section is lazy loaded. So training.reducer cannot be added to the app.reducer. 
+
+in ngRx-Store folder create two new files with training.reducer and training.actions 
+
+training reducer will know about the app reducer. app reducer will not know about the training. 
+	check the *important comment in the app.reducer 
+	check the training.reducer and trainng.actions for more details. Each line has a comment that details the step
+
+in training.module 
+	import ngrx since training is lazy loading
+		import { StoreModule } from '@ngrx/store';
+		import { trainingReducer, TRAINING_REDUCER_SELECTOR } from '../../../app/ngRx-Store/training.reducer';  
+	
+	then in the imports array add the forFeature
+		StoreModule.forFeature(TRAINING_REDUCER_SELECTOR, trainingReducer) //TRAINING_REDUCER_SELECTOR = 'training' is unique identifier and has been placed in training.reducer.ts file
+		
+Dispatching Training Actions in training.service.ts
+	app reducer doesnt know about the training reducer. So below line changes
+	//import * as fromAppReducer from '../ngRx-Store/app.reducer';
+	import * as fromTrainingReducer from '../ngRx-Store/training.reducer';
+	
+	also import training actions 
+	import * as fromTainingActions from '../ngRx-Store/training.actions';
+
+	constructor 
+		currently the store is coming from the appReducer which doesnt know about the training reducer. Change it
+			//private ngStore: Store<fromAppReducer.AppState>
+			private ngStore: Store<fromTrainingReducer.AppState>
+
+	getAvailableExercises
+		we are not going to be using the subject exercisesFetchedSubject any more. Instead we'll use the ngrx to dispatch
+		//assign
+		//passing the data via ngrx store so not assigning any more
+		//this.availableExercises = exercises;
+		//fire exercisesFetchedSubject event 
+		//not using the subject any more, instead using ngrx so dispatch
+		//this.exercisesFetchedSubject.next([...this.availableExercises]);
+		this.ngStore.dispatch(new fromTainingActions.SetAvailableTrainings(exercises));
+	
+	startExercise
+		//we are using ngrx so dispatch, also we are not storing exercises any more. We are dispatching the id
+		//const selectedExercise = this.availableExercises.find(ex => ex.id === exerciseId);
+		//console.log("selectedExercis", selectedExercise);   
+		//this.runningExercise = selectedExercise;
+		//this.startExerciseSubject.next({...selectedExercise});
+		this.ngStore.dispatch(new fromTainingActions.StartTraining(exerciseId));
+		
+	completeExercise
+		//using ngrx so running exercise is not available any more 
+		/*
+		//push the running exercise to exercises with date 
+		//this.exercises.push({...this.runningExercise, date:  new Date(), state: 'completed' });
+		this.addDataToDatabase({...this.runningExercise, date:  new Date(), state: 'completed' });
+		*/
+		this.ngStore.select(fromTrainingReducer.getActiveTraining).pipe(take(1)).subscribe({
+		  next: (activeTraining: ExerciseModel) => {
+			this.addDataToDatabase({...activeTraining, date:  new Date(), state: 'completed' });
+			this.ngStore.dispatch(new fromTainingActions.StopTraining());
+		  }
+		});
+		//we are using ngrx so dispatch, also we are not storing exercises any more, check above subscribe section
+		//this.runningExercise = null;
+		//this.startExerciseSubject.next(null);
+		
+	cancelExercise
+		//using ngrx so running exercise is not available any more 
+		/*
+		//push the running exercise to exercises with date 
+		const actualDuration = this.runningExercise.duration * (progress / 100);
+		const actualCalories = this.runningExercise.calories * (progress / 100);
+		//this.exercises.push({...this.runningExercise, duration: actualDuration, calories: actualCalories, date:  new Date(), state: 'cancelled' });
+		this.addDataToDatabase({...this.runningExercise, duration: actualDuration, calories: actualCalories, date:  new Date(), state: 'cancelled' });
+		*/
+		this.ngStore.select(fromTrainingReducer.getActiveTraining).pipe(take(1)).subscribe({
+		  next: (activeTraining: ExerciseModel) => {
+			const actualDuration = activeTraining.duration * (progress / 100);
+			const actualCalories = activeTraining.calories * (progress / 100);
+			this.addDataToDatabase({...activeTraining, duration: actualDuration, calories: actualCalories, date:  new Date(), state: 'cancelled' });
+			this.ngStore.dispatch(new fromTainingActions.StopTraining());
+		  }
+		});
+		//we are using ngrx so not storing in running exercises any more and we'll dispatch, check above subscribe section
+		//this.runningExercise = null;
+		//this.startExerciseSubject.next(null);
+
+	getPastExercises
+		//we are using ngrx so dispatch
+        //fire exercisesFetchedSubject event 
+        //this.pastExercisesSubject.next([...exercises]);
+        this.ngStore.dispatch(new fromTainingActions.SetPastTrainings(exercises));
+		
+	getRunningExercise
+		//using ngrx so runningExercise is not used ny more, comment the whole section
+	  /*
+	  //get running exercise
+	  get getRunningExercise() : ExerciseModel{
+		return {...this.runningExercise};
+	  }
+	  */
+		
+Fetching Data from the ngRx Store 
+	training.component.ts 
+		import all 
+			import { Store } from '@ngrx/store';
+			import * as fromTrainingReducer from '../../ngRx-Store/training.reducer';
+	
+		we are using ng store so the params will change
+			//make true when ever we have a running training
+			//ongoingTraining = false;
+			ongoingTraining$: Observable<boolean>;
+			//startedExercise: ExerciseModel = <ExerciseModel>{};
+	
+		inject the store first 
+			private ngStore: Store<fromTrainingReducer.AppState>
+		
+		ngOnInit 
+			//we are using ngrx so dispatching the started exercise
+			/*
+			//this receives the started exercise
+			this.startExerciseSubscription = this.trainingService.startExerciseSubject.subscribe({
+			  next: (ex:ExerciseModel) => {
+				this.startedExercise = ex;
+				if(ex){
+				  this.ongoingTraining = true;
+				}
+				else{
+				  this.ongoingTraining = false;
+				}
+			  },
+			  error: (e) => {},
+			  complete: () => {}
+			});
+			*/
+			this.ongoingTraining$ = this.ngStore.select(fromTrainingReducer.getIsOngoingTraining);
+	
+		training.component.html
+			chnage the flag ongoingTraining to ongoingTraining$ and use async pipe with it. 
+			There are two instances of it. 
+			#1: 
+				<mat-tab-group *ngIf="!(ongoingTraining$ | async)">
+			#2: 
+				<app-current-training *ngIf="ongoingTraining$ | async"></app-current-training>
+	
+	new-training.component.ts 
+		//ngrx
+			import { Store } from '@ngrx/store';
+			import * as fromAppReducer from '../../../ngRx-Store/app.reducer';
+			//we are now using training with ngrx so add the training reducer as well 
+			import * as fromTrainingReducer from '../../../ngRx-Store/training.reducer';
+		
+		variables 
+			//trainings now using ngrx
+			//exercises: ExerciseModel[] = [];
+			exercises$: Observable<ExerciseModel[]>;
+		
+		constructor change 
+			private ngStore: Store<fromTrainingReducer.AppState>
+			
+		ngOnInit 
+			//training is now using ngrx
+			/*
+			//subscribe to exercisesFetchedSubject
+			this.exercisesFetchedSubscription = this.trainingService.exercisesFetchedSubject.subscribe({
+			  next: (exercises: ExerciseModel[]) => {
+				this.exercises = exercises;
+			  },
+			  error: (e) => {},
+			  complete: () => {}
+			});
+			*/
+			this.exercises$ = this.ngStore.select(fromTrainingReducer.getAvailableExercises);
+			
+		new-training.component.html 
+			where ever exercises us being used (three places) change to 
+				exercises$ | async
+				
+	current-training.component.ts 
+		//ngrx 
+			import { Store } from '@ngrx/store';
+			import * as fromTrainingReducer from '../../../ngRx-Store/training.reducer';
+		
+		constructor 
+			private ngStore: Store<fromTrainingReducer.AppState>
+			
+		ngOnInit 
+			//training is now using ngrx
+			/*
+			//get running exercise
+			this.runningExercise = this.trainingService.getRunningExercise;
+			*/
+			this.ngStore.select(fromTrainingReducer.getActiveTraining).pipe(take(1)).subscribe({
+			  next: (activeExercise: ExerciseModel) => {
+				this.runningExercise = activeExercise;
+			  },
+			  error: (e) => {},
+			  complete: () => {}
+			});
+			
+	past-training.component.ts 
+		//ngrx
+			import { Store } from '@ngrx/store';
+			import * as fromTrainingReducer from '../../../ngRx-Store/training.reducer';
+			
+		constructor
+			private ngStore: Store<fromTrainingReducer.AppState>
+			
+		ngOnInit 
+			//using ngrx now
+			/*
+			//attach dataSource to the dataTable
+			//this.dataSource.data = this.trainingService.getPastExercises;
+			this.pastExerciesSubscription = this.trainingService.pastExercisesSubject.subscribe({
+			  next: (pastExercises: ExerciseModel[]) => {
+				this.dataSource.data = pastExercises;
+			  },
+			  error: (e) => {},
+			  complete: () => {}
+			});
+			*/
+			this.ngStore.select(fromTrainingReducer.getPastExercises).subscribe({
+			  next: (pastExercises: ExerciseModel[]) => {
+				this.dataSource.data = pastExercises;
+			  }
+			});
+			this.trainingService.getPastExercises();
+			
+Cleanup
+	I have left the old subscriptions and imports etc in place since the code is commented only. 

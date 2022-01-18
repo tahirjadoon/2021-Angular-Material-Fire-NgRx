@@ -1,0 +1,28 @@
+{
+    "logins": [
+        {
+            "userId": "t@t.com",
+            "password": "dec122021",
+            "type": "user"
+        },
+        {
+            "userId": "t2@t.com",
+            "password": "dec122021",
+            "type": "user"
+        }
+    ],
+    "firebase": {
+        "backEndUrl": "",
+        "backEndApiKey": "",
+        "backEndAuthDomain": ""
+    },
+    "projectInfo": {
+        "name" : "Angular app with Angular Material, Angular Fire and NgRx",
+        "ngVersion":"Angular CLI: 13.0.2",
+        "nodeVersion": "Node 16.13.0",
+        "npmVersion": "npm 8.1.3",
+        "ngMaterialVersion": "Angular Material 13.0.3",
+        "notes": "<ul><li>tsconfoig.json add resolveJsonModule=true and allowSyntheticDefaultImports=true</li><li>Read <b>000 Introduction.txt</b> for details</li><li>Open <b>Config/firebase-config.json</b> and fill firebase section accordingly</li></ul>"
+    }
+}
+ 
