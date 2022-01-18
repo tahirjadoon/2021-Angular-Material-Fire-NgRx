@@ -4,6 +4,13 @@
 >ng build
 	Build app 
 	
+	https://angular.io/cli/build
+	
+	ng build --prod is deprecated. use 
+	ng build --configuration production
+	
+	move the contents of the "dist" folder to the server
+	
 >ng serve
 	Run app 
 	

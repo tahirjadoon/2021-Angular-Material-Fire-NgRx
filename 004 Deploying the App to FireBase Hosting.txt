@@ -1,0 +1,32 @@
+
+>ng build
+	Build app 
+	
+	https://angular.io/cli/build
+	
+	ng build --prod is deprecated. use 
+	ng build --configuration production
+	
+	move the contents of the "dist" folder to the server
+	
+	
+Go to Hosting tab in the firebase console. Check following for more details
+	https://firebase.google.com/docs/hosting/?authuser=0#implementation_path 
+	
+Need to install the following package first 
+	npm install -g firebase-tools
+	
+Initialize your project
+	Open a terminal window and navigate to or create a root directory for your web app
+
+	Sign in to Google
+		firebase login
+	Initiate your project
+	Run this command from your app’s root directory:
+		firebase init
+		
+Deploy to Firebase Hosting
+	When you’re ready, deploy your web app
+	Put your static files (e.g., HTML, CSS, JS) in your app’s deploy directory (the default is “public”). Then, run this command from your app’s root directory:
+
+		firebase deploy
